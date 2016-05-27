@@ -23,6 +23,7 @@ import os
 import numpy as np
 import time
 import re
+import seaborn as sns
 
 ##########################################################################################
 ##########################################################################################
@@ -363,8 +364,64 @@ def conversion_alignment(alignment_file, format):
 
 	return os.path.join(os.path.dirname(alignment_file),"tmp.fasta")
 
+##########################################################################################
+##########################################################################################
+
+def read_color_file(color_file) :
+
+	"""
+	Function that read the color file and set the dictionnary with it
+
+	:param color_file: the name of the color file
+	:type: str
+	:return: the dictionary contructed with name as keys and color as values
+	:rtype: dict
+
+	"""
 
 
+ 	my_color = np.loadtxt(color_file, delimiter="\t", comments="//", dtype="string")
+	return {line[0]:line[1] for line in my_color}
+
+##########################################################################################
+##########################################################################################
+
+def create_color_dict(cmap, ) :
+	sns.color_palette("spectral", 10).as_hex()
+
+##########################################################################################
+##########################################################################################
+
+def write_big_new_file(file_tab, files_f, write_file) :
+
+	"""
+	Function that take the information about the system in the fasta file and put all the information about taxonomy
+	and name
+
+	:param file_tab: Name of the file with the taxonomic information
+	:type: str
+	:param file_f: name of the alignement file in fasta format
+	:type: str
+	:param write_file: name of the file where we want to write the information
+	:type: str
+	"""
+
+	tab_info = np.loadtxt(file_tab, delimiter="\t", dtype="string", comments="##")
+
+	with open(write_file, "w") as w_file :
+		line = "#%s\t%s\t%s\t%s\t%s\n" % ("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
+		w_file.write(line)
+		for seq in SeqIO.parse(file_f, format="fasta") :
+			if "NC_" in seq.id :
+				name_species = "_".join(seq.id.split("_")[:2])
+				system_name = seq.id.split("_")[seq.id.split("_").index("D")]
+			else :
+				name_species = seq.id.split("_")[0][:4]
+				system_name = seq.id.split("_")[seq.id.split("_").index("V")]
+
+			index_species = tab_info[:,0].tolist().index(name_species)
+			line = "%s\t%s\t%s\t%s\t%s\n" % (seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
+			w_file.write(line)
 
 
 ##########################################################################################
@@ -405,3 +462,17 @@ if __name__ == '__main__':
 		os.remove(file_name_abspath)
 
 PATH_ITOL_FILE = "/Users/rdenise/Documents/Analysis_tree/virb4/label_itol/%s/" % time.strftime("%d_%m_%y")
+
+#Paired bon pour les systemes < 12 sinon nipy_spectral
+#Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
+
+
+
+
+fileTab =
+fileFasta =
+
+
+fileWrite = os.path.join(PATH_ITOL_FILE,"ANNOTATION_TAB")
+
+write_big_new_file(fileTab, fileFasta, fileWrite)
