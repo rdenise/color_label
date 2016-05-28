@@ -59,7 +59,7 @@ def create_colorstrip_itol_file(info_tab):
 	print "# COLOR STRIP FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_colorstrip.txt", 'w') as writing_file:
+	with open(PREFIX+"_colorstrip.txt", 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com\n")
