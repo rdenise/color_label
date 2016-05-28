@@ -1,0 +1,12 @@
+Plasmid #f8e0f7
+Proteobacteria  #f78181
+Firmicutes  #ebe891
+Actinobacteria  #89955f
+Archaea #bcf5a9
+Cholorobi #955f5f
+Chlamydiae  #a6ffe2
+Planctomycetes  #ac58fa
+Cyanobacteria #81f7f3
+Viruses #d8d8d8
+Bacteria  #819ff7
+Acidobacteria #c5a583
