@@ -1,5 +1,6 @@
 # Colorize
 
+Script to construct colorstrip, colorrange or binary file
 
 Installation libraries needed
 -----------------------------
