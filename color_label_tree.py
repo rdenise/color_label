@@ -58,9 +58,9 @@ def create_colorstrip_itol_file(fileName):
 	print "# COLOR STRIP FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN))
+	create_folder(os.path.join(PREFIX))
 
-	with open(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN,"colorstrip_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"colorstrip_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com\n")
@@ -116,9 +116,9 @@ def create_colorlabel_itol_file(fileName):
 	print "# LABEL COLOR FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN))
+	create_folder(os.path.join(PREFIX))
 
-	with open(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN,"colorlabel_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"colorlabel_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("COLOR\t#a4a4a4\n")
@@ -175,9 +175,9 @@ def create_colorrange_itol_file(fileName, fileTab):
 	print "# COLOR RANGE FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN))
+	create_folder(os.path.join(PREFIX))
 
-	with open(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN,"colorrange_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"colorrange_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
 		writing_file.write("TREE_COLORS\n")
 		writing_file.write("SEPARATOR SPACE\n")
 		writing_file.write("DATA\n")
@@ -240,9 +240,9 @@ def create_labels_itol_file(fileName, fileTab):
 	print "# LABELS FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN))
+	create_folder(os.path.join(PREFIX))
 
-	with open(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN,"id_label"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"id_label"+NAME_PROTEIN+".txt"), 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
@@ -298,9 +298,9 @@ def create_labels_itol_file_reverse(fileName, fileTab):
 	print "# LABELS REVERSE FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN))
+	create_folder(os.path.join(PREFIX))
 
-	with open(os.path.join(PATH_ITOL_FILE,NAME_PROTEIN,"id_label_reverse"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"id_label_reverse"+NAME_PROTEIN+".txt"), 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
@@ -397,7 +397,7 @@ def create_color_dict(cmap, col_infoTab, name) :
 
 	"""
 
-	color_dir = os.path.join(PATH_ITOL_FILE, "file_color")
+	color_dir = os.path.join(os.path.dirname(PREFIX), "file_color")
 	create_folder(color_dir)
 	uniq_infoTab = np.unique(col_infoTab)
 	uniq_infoTab = np.delete(unique, (uniq_infoTab == "generique"))
@@ -473,7 +473,7 @@ general_option.add_argument("-f",'--format',
 							required=True,
 							dest="format"
 							help="")
-required_options.add_argument("-pre",'--prefix',
+general_options.add_argument("-pre",'--prefix',
  							default=os.path.abspath(general_option.seqFile),
 							dest="prefix"
 							metavar='<PREFIX>'
@@ -483,34 +483,52 @@ annotation_option = parser.add_argument_group(title = "Table annotation options"
 annotation_option_option.add_argument("-old",'--oldannotation',
 							metavar="<INFO_TAB>"
 							dest="oldInfo",
+							default=None
 							help="File with the annotation for each species in old format")
 annotation_option_option.add_argument("-annot",'--annotationtab',
 							metavar="<ANNOTATION_TAB>"
 							dest="annotFile",
+							default=None
 							help="File with the annotation for each leaf in the tree in rigth format")
 
+color_option = parser.add_argument_group(title = "Color options")
+color_option.add_argument("-sysCo",'--systemsColor',
+							metavar="<Color_system_File>"
+							dest="sysColor",
+							default=None
+							help="File the name of the of the systems and the color for each systems in hexadecimal")
+color_option.add_argument("-phyCo",'--phylumColor',
+							metavar="<Color_system_File>"
+							dest="phylumColor",
+							default=None
+							help="File the name of the of the phylum and the color for each systems in hexadecimal")
 
+PREFIX = general_option.prefix
+
+create_folder(os.path.dirname(prefix))
 
 FORMAT = general_option.format.lower()
 
-file_name = os.path.basename(required_options.seqFile)
-PATH_ALIGNEMENT = os.path.dirname(os.path.abspath(required_options.seqFile))
+file_name = os.path.abspath(required_options.seqFile)
 
 if FORMAT != "fasta" :
-	file_name_abspath = conversion_alignment(os.path.join(PATH_ALIGNEMENT,file_name), FORMAT)
-	file_name = os.path.basename(file_name_abspath)
+	file_name_abspath = conversion_alignment(file_name, FORMAT)
+	file_name = file_name_abspath
 
 if not (annotation_option.oldInfo or annotation_option.annotFile):
     parser.error("you MUST provided annotation table.")
 elif annotation_option.oldInfo :
-	write_big_new_file(annotation_option.oldInfo, os.path.join(PATH_ALIGNEMENT,file_name), write_file)
+	write_big_new_file(annotation_option.oldInfo, file_name, os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
+	file_tab = os.path.abspath(os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
+else:
+	file_tab = general_option.annotFile
 
+tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
 
-
-file_tab = os.path.abspath(sys.argv[2])
-
-NAME_PROTEIN = sys.argv[3]
-
+if not color_option.sysColor :
+	create_color_dict("Paired", tab_numpy[:,1], systems.color)
+else :
+	read_color_file(color_file)
 
 
 create_colorstrip_itol_file(file_name)
@@ -524,7 +542,7 @@ create_labels_itol_file(file_name, file_tab)
 if FORMAT != "fasta" :
 	os.remove(file_name_abspath)
 
-PATH_ITOL_FILE = "/Users/rdenise/Documents/Analysis_tree/virb4/label_itol/%s/" % time.strftime("%d_%m_%y")
+
 
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
@@ -536,6 +554,6 @@ fileTab =
 fileFasta =
 
 
-fileWrite = os.path.join(PATH_ITOL_FILE,"ANNOTATION_TAB")
+fileWrite = os.path.join(PREFIX,"ANNOTATION_TAB")
 
 write_big_new_file(fileTab, fileFasta, fileWrite)
