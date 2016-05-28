@@ -431,10 +431,13 @@ def write_big_new_file(file_tab, files_f, write_file) :
 		for seq in SeqIO.parse(file_f, format="fasta") :
 			if "NC_" in seq.id :
 				name_species = "_".join(seq.id.split("_")[:2])
-				system_name = seq.id.split("_")[seq.id.split("_").index("D")]
+				if 'T4SS' in seq.id :
+					system_name = seq.id.split("_")[seq.id.split("_").index("D")+1]
+				else :
+					system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
 			else :
 				name_species = seq.id.split("_")[0][:4]
-				system_name = seq.id.split("_")[seq.id.split("_").index("V")]
+				system_name = seq.id.split("_")[seq.id.split("_").index("V")-1]
 
 			index_species = tab_info[:,0].tolist().index(name_species)
 			line = "%s\t%s\t%s\t%s\t%s\n" % (seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
@@ -503,6 +506,8 @@ color_option.add_argument("-phyCo",'--phylumColor',
 							default=None
 							help="File the name of the of the phylum and the color for each systems in hexadecimal")
 
+color_option = parser.add_argument_group(title = "Color options")
+
 PREFIX = general_option.prefix
 
 create_folder(os.path.dirname(prefix))
@@ -520,40 +525,31 @@ if not (annotation_option.oldInfo or annotation_option.annotFile):
 elif annotation_option.oldInfo :
 	write_big_new_file(annotation_option.oldInfo, file_name, os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
 	file_tab = os.path.abspath(os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
-else:
+elif general_option.annotFile:
 	file_tab = general_option.annotFile
 
 tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
 
-if not color_option.sysColor :
-	create_color_dict("Paired", tab_numpy[:,1], systems.color)
-else :
-	read_color_file(color_file)
+#Paired bon pour les systemes < 12 sinon nipy_spectral
+#Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
 
+if not color_option.sysColor :
+	DICT_COLORSTRIP = create_color_dict("Paired", tab_numpy[:,-1], systems.color)
+else :
+	DICT_COLORSTRIP = read_color_file(color_file)
+
+if not color_option.phylumColor :
+	DICT_COLORSTRIP = create_color_dict("Set3", tab_numpy[:,-2], systems.color)
+else :
+	DICT_COLORSTRIP = read_color_file(color_file)
 
 create_colorstrip_itol_file(file_name)
 
 create_colorlabel_itol_file(file_name)
 
-create_colorrange_itol_file(file_name, file_tab)
+create_colorrange_itol_file(file_name, tab_numpy)
 
-create_labels_itol_file(file_name, file_tab)
+create_labels_itol_file(file_name, tab_numpy)
 
 if FORMAT != "fasta" :
 	os.remove(file_name_abspath)
-
-
-
-#Paired bon pour les systemes < 12 sinon nipy_spectral
-#Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
-
-
-
-
-fileTab =
-fileFasta =
-
-
-fileWrite = os.path.join(PREFIX,"ANNOTATION_TAB")
-
-write_big_new_file(fileTab, fileFasta, fileWrite)
