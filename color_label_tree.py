@@ -59,7 +59,7 @@ def create_colorstrip_itol_file(info_tab):
 	print "# COLOR STRIP FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_colorstrip.txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_colorstrip.txt", 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com\n")
@@ -107,7 +107,7 @@ def create_binary_itol_file(info_tab):
 	print "# LABEL BINARY FILE"
 	print "#################\n"
 
-	with open(PREFIX,"_labelbinary.txt"), 'w') as writing_file:
+	with open(PREFIX,"_labelbinary.txt", 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("COLOR\t#a4a4a4\n")
@@ -159,7 +159,7 @@ def create_colorrange_itol_file(info_tab):
 	print "# COLOR RANGE FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_colorrange.txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_colorrange.txt", 'w') as writing_file:
 		writing_file.write("TREE_COLORS\n")
 		writing_file.write("SEPARATOR SPACE\n")
 		writing_file.write("DATA\n")
@@ -207,7 +207,7 @@ def create_labels_itol_file(info_tab):
 	print "# LABELS FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_id_label.txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_id_label.txt", 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
@@ -249,7 +249,7 @@ def create_labels_itol_file_reverse(info_tab):
 	print "# LABELS REVERSE FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_id_label_reverse.txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_id_label_reverse.txt", 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
