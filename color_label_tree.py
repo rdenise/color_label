@@ -365,7 +365,7 @@ def write_big_new_file(file_tab, files_f, write_file) :
 	tab_info = np.loadtxt(file_tab, delimiter="\t", dtype="string", comments="##")
 
 	with open(write_file, "w") as w_file :
-		line = "#%s\t%s\t%s\t%s\t%s\n" % ("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
+		line = "#%s\t%s\t%s\t%s\t%s\t%s\n" % ("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
 		w_file.write(line)
 		for seq in SeqIO.parse(file_f, format="fasta") :
 			if "NC_" in seq.id :
@@ -379,7 +379,7 @@ def write_big_new_file(file_tab, files_f, write_file) :
 				system_name = seq.id.split("_")[seq.id.split("_").index("V")-1]
 
 			index_species = tab_info[:,0].tolist().index(name_species)
-			line = "%s\t%s\t%s\t%s\t%s\n" % (seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
+			line = "%s\t%s\t%s\t%s\t%s\t%s\n" % (seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
 			w_file.write(line)
 
 
