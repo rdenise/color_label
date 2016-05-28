@@ -44,13 +44,14 @@ def create_folder(mypath):
 ##########################################################################################
 ##########################################################################################
 
-def create_colorstrip_itol_file(fileName):
+def create_colorstrip_itol_file(info_tab):
 
 	"""
-	Function that create a file in itol colorstrip format for the sequence in the fileName
+	Function that create a file in itol colorstrip format for the sequence in the info_tab
 	with color for each kind of
-	:param fileName: base name of the fasta file of the alignement that produce the tree
-	:type: string
+
+	:param info_tab: table of the annotation table
+	:type: numpy.ndarray
 	:return: Nothing
 	"""
 
@@ -58,9 +59,7 @@ def create_colorstrip_itol_file(fileName):
 	print "# COLOR STRIP FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PREFIX))
-
-	with open(os.path.join(PREFIX,"colorstrip_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_colorstrip.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com\n")
@@ -71,30 +70,21 @@ def create_colorstrip_itol_file(fileName):
 		writing_file.write("LEGEND_LABELS\t"+"\t".join(DICT_COLORSTRIP.keys())+"\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		for seq in alignment :
+		for seq in info_tab :
 
 			bar.update(progression)
 			progression +=1
 
-			if "generique" in seq.id or "choice" in seq.id:
+			if "generique" in seq[0] or "choice" in seq[0]:
 				continue
-			elif "_V_" in seq.id:
-				writing_file.write(seq.id+"\t"+DICT_COLORSTRIP[seq.id.split("_")[seq.id.split("_").index('V')-1]]+"\n")
-			elif "T4SS" not in seq.id :
-				writing_file.write(seq.id+"\t"+DICT_COLORSTRIP[seq.id.split("_")[seq.id.split("_").index('D')-1]]+"\n")
-			else :
-				try:
-					writing_file.write(seq.id+"\t"+DICT_COLORSTRIP[re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)]+"\n")
-				except KeyError:
-					pass
+			else:
+				writing_file.write(seq[0]+"\t"+DICT_COLORSTRIP[seq[-1]]+"\n")
 	bar.finish()
 
 	return
@@ -102,23 +92,22 @@ def create_colorstrip_itol_file(fileName):
 ##########################################################################################
 ##########################################################################################
 
-def create_colorlabel_itol_file(fileName):
+def create_binary_itol_file(info_tab):
 
 	"""
-	Function that create a file in itol color label format for the sequence in the fileName
-	and set all the verified sequence in red
-	:param fileName: base name of the fasta file of the alignement that produce the tree
-	:type: string
+	Function that create a file in itol color label format for the sequence in the info_tab
+	and set all the verified sequence will have grey square
+
+	:param info_tab: table of the annotation table
+	:type: numpy.ndarray
 	:return: Nothing
 	"""
 
 	print "\n#################"
-	print "# LABEL COLOR FILE"
+	print "# LABEL BINARY FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PREFIX))
-
-	with open(os.path.join(PREFIX,"colorlabel_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(PREFIX,"_labelbinary.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("COLOR\t#a4a4a4\n")
@@ -131,23 +120,21 @@ def create_colorlabel_itol_file(fileName):
 		writing_file.write("LEGEND_LABELS\tverify\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		for seq in alignment :
+		for seq in info_tab :
 
 			bar.update(progression)
 			progression +=1
 
-			if "_V_" in seq.id :
-				writing_file.write(seq.id+"\t1\n")
+			if "_V_" in seq[0] :
+				writing_file.write(seq[0]+"\t1\n")
 			else :
-				writing_file.write(seq.id+"\t0\n")
+				writing_file.write(seq[0]+"\t0\n")
 
 	bar.finish()
 
@@ -158,16 +145,13 @@ def create_colorlabel_itol_file(fileName):
 
 
 
-def create_colorrange_itol_file(fileName, fileTab):
+def create_colorrange_itol_file(info_tab):
 
 	"""
-	Function that create a file in itol color range format for the sequence in the fileName
+	Function that create a file in itol color range format for the sequence in the info_tab
 	and with color for each kingdom or subkingdom
-	:param fileName: base name of the fasta file of the alignement that produce the tree
-	:type: string
-	:param fileTab: Absolute path of the tabular file with the information about the species
-	(kingdom, lineage)
-	:type: string
+	:param info_tab: table of the annotation table
+	:type: numpy.ndarray
 	:return: Nothing
 	"""
 
@@ -175,43 +159,29 @@ def create_colorrange_itol_file(fileName, fileTab):
 	print "# COLOR RANGE FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PREFIX))
-
-	with open(os.path.join(PREFIX,"colorrange_"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_colorrange.txt"), 'w') as writing_file:
 		writing_file.write("TREE_COLORS\n")
 		writing_file.write("SEPARATOR SPACE\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(fileName, "fasta")
-		info_tab = np.loadtxt(fileTab, dtype='string', comments='##', delimiter='\t')
-
-		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		for seq in alignment :
+		for seq in info_tab :
 
 			bar.update(progression)
 			progression +=1
 
-			if "NC_" in seq.id :
-				sub_id = "_".join(seq.id.split("_")[:2])
-			else :
-				sub_id = seq.id.split("_")[0][:4]
-
-
-			if "Bacteria" in info_tab[:,2][list(info_tab[:,0]).index(sub_id)] :
-				lineage = info_tab[:,3][list(info_tab[:,0]).index(sub_id)]
-			else :
-				lineage = info_tab[:,2][list(info_tab[:,0]).index(sub_id)]
-
+			lineage = seq[-2]
 
 			if lineage in DICT_COLORRANGE :
-				writing_file.write(seq.id+" range "+DICT_COLORRANGE[lineage]+" "+lineage+"\n")
+				writing_file.write(seq[0]+" range "+DICT_COLORRANGE[lineage]+" "+lineage+"\n")
+			elif seq[-3]=="Archaea":
+				writing_file.write(seq[0]+" range "+DICT_COLORRANGE["Archaea"]+" Archaea\n")
 			else :
-				writing_file.write(seq.id+" range "+DICT_COLORRANGE["Bacteria"]+" Bacteria\n")
+				writing_file.write(seq[0]+" range "+DICT_COLORRANGE["Bacteria"]+" Bacteria\n")
 
 	bar.finish()
 
@@ -222,17 +192,14 @@ def create_colorrange_itol_file(fileName, fileTab):
 
 
 
-def create_labels_itol_file(fileName, fileTab):
+def create_labels_itol_file(info_tab):
 
 
 	"""
 	Function that let the possibility to change the name of the leafs' label
 
-	:param fileName: base name of the fasta file of the alignement that produce the tree
-	:type: string
-	:param fileTab: Absolute path of the tabular file with the information about the species
-	(kingdom, lineage)
-	:type: string
+	:param info_tab: table of the annotation table
+	:type: numpy.ndarray
 	:return: Nothing
 	"""
 
@@ -240,35 +207,22 @@ def create_labels_itol_file(fileName, fileTab):
 	print "# LABELS FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PREFIX))
-
-	with open(os.path.join(PREFIX,"id_label"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_id_label.txt"), 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(fileName, "fasta")
-		info_tab = np.loadtxt(fileTab, dtype='string', comments='##', delimiter='\t')
-
-		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		for seq in alignment :
+		for seq in info_tab :
 
 			bar.update(progression)
 			progression +=1
 
-			if "NC_" in seq.id :
-				sub_id = "_".join(seq.id.split("_")[:2])
-			else :
-				sub_id = seq.id.split("_")[0][:4]
-
-			name = info_tab[:,1][list(info_tab[:,0]).index(sub_id)]
-
-			writing_file.write(seq.id+"\t"+" ".join(name.split(" ")[:2])+"\n")
+			writing_file.write(seq[0]+"\t"+seq[2]+"\n")
 
 	bar.finish()
 
@@ -280,17 +234,14 @@ def create_labels_itol_file(fileName, fileTab):
 
 
 
-def create_labels_itol_file_reverse(fileName, fileTab):
+def create_labels_itol_file_reverse(info_tab):
 
 
 	"""
 	Function that let the possibility to change the name of the leafs' label
 
-	:param fileName: base name of the fasta file of the alignement that produce the tree
-	:type: string
-	:param fileTab: Absolute path of the tabular file with the information about the species
-	(kingdom, lineage)
-	:type: string
+	:param info_tab: table of the annotation table
+	:type: numpy.ndarray
 	:return: Nothing
 	"""
 
@@ -298,35 +249,22 @@ def create_labels_itol_file_reverse(fileName, fileTab):
 	print "# LABELS REVERSE FILE"
 	print "#################\n"
 
-	create_folder(os.path.join(PREFIX))
-
-	with open(os.path.join(PREFIX,"id_label_reverse"+NAME_PROTEIN+".txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"_id_label_reverse.txt"), 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(fileName, "fasta")
-		info_tab = np.loadtxt(fileTab, dtype='string', comments='##', delimiter='\t')
-
-		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(fileName, "fasta")
 
-		for seq in alignment :
+		for seq in info_tab :
 
 			bar.update(progression)
 			progression +=1
 
-			if "NC_" in seq.id :
-				sub_id = "_".join(seq.id.split("_")[:2])
-			else :
-				sub_id = seq.id.split("_")[0][:4]
-
-			name = info_tab[:,1][list(info_tab[:,0]).index(sub_id)]
-
-			writing_file.write(" ".join(name.split(" ")[:2])+"\t"+seq.id+"\n")
+			writing_file.write(seq[2]+"\t"+seq[0]+"\n")
 
 	bar.finish()
 
@@ -432,7 +370,7 @@ def write_big_new_file(file_tab, files_f, write_file) :
 			if "NC_" in seq.id :
 				name_species = "_".join(seq.id.split("_")[:2])
 				if 'T4SS' in seq.id :
-					system_name = seq.id.split("_")[seq.id.split("_").index("D")+1]
+					system_name = re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)
 				else :
 					system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
 			else :
@@ -477,7 +415,7 @@ general_option.add_argument("-f",'--format',
 							dest="format"
 							help="")
 general_options.add_argument("-pre",'--prefix',
- 							default=os.path.abspath(general_option.seqFile),
+ 							default=os.path.join(os.path.abspath(general_option.seqFile),"colorize_%s" %(time.strftime("%d_%m_%y"))),
 							dest="prefix"
 							metavar='<PREFIX>'
 							help="Using <PREFIX> for output files (default: seqFile directory)")
@@ -510,7 +448,7 @@ color_option = parser.add_argument_group(title = "Color options")
 
 PREFIX = general_option.prefix
 
-create_folder(os.path.dirname(prefix))
+create_folder(os.path.dirname(PREFIX))
 
 FORMAT = general_option.format.lower()
 
@@ -543,13 +481,19 @@ if not color_option.phylumColor :
 else :
 	DICT_COLORSTRIP = read_color_file(color_file)
 
-create_colorstrip_itol_file(file_name)
+# Appel des fonctions
+######
 
-create_colorlabel_itol_file(file_name)
+create_colorstrip_itol_file(tab_numpy)
 
-create_colorrange_itol_file(file_name, tab_numpy)
+create_binary_itol_file(tab_numpy)
 
-create_labels_itol_file(file_name, tab_numpy)
+create_colorrange_itol_file(tab_numpy)
+
+create_labels_itol_file(tab_numpy)
+
+######
+# Fin des fonctions
 
 if FORMAT != "fasta" :
 	os.remove(file_name_abspath)
