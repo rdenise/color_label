@@ -108,7 +108,7 @@ def create_binary_itol_file(info_tab):
 	print "# LABEL BINARY FILE"
 	print "#################\n"
 
-	with open(PREFIX,"_labelbinary.txt", 'w') as writing_file:
+	with open(PREFIX+"_labelbinary.txt", 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("COLOR\t#a4a4a4\n")
@@ -339,16 +339,16 @@ def create_color_dict(cmap, col_infoTab, name) :
 	color_dir = os.path.join(os.path.dirname(PREFIX), "file_color")
 	create_folder(color_dir)
 	uniq_infoTab = np.unique(col_infoTab)
-	uniq_infoTab = np.delete(unique, (uniq_infoTab == "generique"))
+	uniq_infoTab = uniq_infoTab[uniq_infoTab != "generique"]
 	my_color = sns.color_palette(cmap, len(uniq_infoTab)).as_hex()
 	uniq_infoTab = np.c_[uniq_infoTab, my_color]
-	np.savetxt(os.path.join(color_dir, name), uniq_infoTab, delimiter='\t', fmt='string')
+	np.savetxt(os.path.join(color_dir, name), uniq_infoTab, delimiter='\t', fmt='%s')
 	return {line[0]:line[1] for line in uniq_infoTab}
 
 ##########################################################################################
 ##########################################################################################
 
-def write_big_new_file(file_tab, files_f, write_file) :
+def write_big_new_file(file_tab, file_f, write_file) :
 
 	"""
 	Function that take the information about the system in the fasta file and put all the information about taxonomy
@@ -480,15 +480,15 @@ tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
 
-if not color_option.sysColor :
+if not args.sysColor :
 	DICT_COLORSTRIP = create_color_dict("Paired", tab_numpy[:,-1], "systems.color")
 else :
 	DICT_COLORSTRIP = read_color_file(color_file)
 
-if not color_option.phylumColor :
-	DICT_COLORSTRIP = create_color_dict("Set3", tab_numpy[:,-2], "phylum.color")
+if not args.phylumColor :
+	DICT_COLORRANGE = create_color_dict("Set3", tab_numpy[:,-2], "phylum.color")
 else :
-	DICT_COLORSTRIP = read_color_file(color_file)
+	DICT_COLORRANGE = read_color_file(color_file)
 
 # Appel des fonctions
 ######
