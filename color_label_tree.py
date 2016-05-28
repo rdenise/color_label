@@ -386,8 +386,31 @@ def read_color_file(color_file) :
 ##########################################################################################
 ##########################################################################################
 
-def create_color_dict(cmap, ) :
-	sns.color_palette("spectral", 10).as_hex()
+def create_color_dict(cmap, col_infoTab, name) :
+
+	"""
+	Function that create the color file and set the dictionnary with it
+
+	:param cmap: the cmap in which the color will be choose
+	:type: str
+	:param col_infoTab: the column of the INFO_TAB with the name of the system
+	or phylum
+	:type: numpy.ndarray
+	:param name: name of the file *.color
+	:type: str
+	:return: the dictionary contructed with name as keys and color as values
+	:rtype: dict
+
+	"""
+
+	color_dir = os.path.join(PATH_ITOL_FILE, "color")
+	create_folder(color_dir)
+	uniq_infoTab = np.unique(col_infoTab)
+	uniq_infoTab = np.delete(unique, (uniq_infoTab == "generique"))
+	my_color = sns.color_palette(cmap, len(uniq_infoTab)).as_hex()
+	uniq_infoTab = np.c_[uniq_infoTab, my_color]
+	np.savetxt(os.path.join(color_dir, name), uniq_infoTab, delimiter='\t', fmt='string')
+	return {line[0]:line[1] for line in uniq_infoTab}
 
 ##########################################################################################
 ##########################################################################################
