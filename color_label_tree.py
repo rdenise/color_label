@@ -18,6 +18,7 @@ import time
 import re
 import seaborn as sns
 import argparse
+from textwrap import dedent
 
 ##########################################################################################
 ##########################################################################################
@@ -159,7 +160,7 @@ def create_colorrange_itol_file(info_tab):
 	print "# COLOR RANGE FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_colorrange.txt", 'w') as writing_file:
+	with open(PREFIX+"_colorrange.txt", 'w') as writing_file:
 		writing_file.write("TREE_COLORS\n")
 		writing_file.write("SEPARATOR SPACE\n")
 		writing_file.write("DATA\n")
@@ -207,7 +208,7 @@ def create_labels_itol_file(info_tab):
 	print "# LABELS FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_id_label.txt", 'w') as writing_file:
+	with open(PREFIX+"_id_label.txt", 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
@@ -249,7 +250,7 @@ def create_labels_itol_file_reverse(info_tab):
 	print "# LABELS REVERSE FILE"
 	print "#################\n"
 
-	with open(os.path.join(PREFIX,"_id_label_reverse.txt", 'w') as writing_file:
+	with open(PREFIX+"_id_label_reverse.txt", 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
@@ -394,6 +395,9 @@ def write_big_new_file(file_tab, files_f, write_file) :
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
      description=dedent('''
 
+
+---------------------------------------------------------------------------------------
+
  XXXXXXX             XX                    XXXXXX          XXXXXXXXX           XXXXXX
 XX          XXXXX    XX          XXXXX    XX    XX  XXXXXX      XXX  XXXXXXXX XX    XX
 XX        XXX   XXX  XX        XXX   XXX  XX     XX   XX       XXX   XX       XX     XX
@@ -402,69 +406,74 @@ XX       XX       XX XX       XX       XX XX XXX      XX     XXX     XXXX     XX
 XX       XX       XX XX       XX       XX XX  XX      XX    XXX      XX       XX  XX
  XXXXXXX  XXX   XXX   XXXXXXX  XXX   XXX  XX   XXXX   XX   XXXXXXXXX XX       XX   XXXX
              XXX                  XXX               XXXXXX           XXXXXXXX
+
+---------------------------------------------------------------------------------------
 ''') )
 
 general_option = parser.add_argument_group(title = "General input dataset options")
 general_option.add_argument("-s",'--seqfile',
  							required=True,
-							metavar="<file>"
+							metavar="<file>",
 							dest="seqFile",
 							help="File with the sequences used for the alignment")
 general_option.add_argument("-f",'--format',
 							required=True,
-							dest="format"
+							dest="format",
 							help="")
-general_options.add_argument("-pre",'--prefix',
- 							default=os.path.join(os.path.abspath(general_option.seqFile),"colorize_%s" %(time.strftime("%d_%m_%y"))),
-							dest="prefix"
-							metavar='<PREFIX>'
+general_option.add_argument("-pre",'--prefix',
+ 							default=None,
+							dest="prefix",
+							metavar='<PREFIX>',
 							help="Using <PREFIX> for output files (default: seqFile directory)")
 
 annotation_option = parser.add_argument_group(title = "Table annotation options")
-annotation_option_option.add_argument("-old",'--oldannotation',
-							metavar="<INFO_TAB>"
+annotation_option.add_argument("-old",'--oldannotation',
+							metavar="<INFO_TAB>",
 							dest="oldInfo",
-							default=None
+							default=None,
 							help="File with the annotation for each species in old format")
-annotation_option_option.add_argument("-annot",'--annotationtab',
-							metavar="<ANNOTATION_TAB>"
+annotation_option.add_argument("-annot",'--annotationtab',
+							metavar="<ANNOTATION_TAB>",
 							dest="annotFile",
-							default=None
+							default=None,
 							help="File with the annotation for each leaf in the tree in rigth format")
 
 color_option = parser.add_argument_group(title = "Color options")
 color_option.add_argument("-sysCo",'--systemsColor',
-							metavar="<Color_system_File>"
+							metavar="<Color_system_File>",
 							dest="sysColor",
-							default=None
+							default=None,
 							help="File the name of the of the systems and the color for each systems in hexadecimal")
 color_option.add_argument("-phyCo",'--phylumColor',
-							metavar="<Color_system_File>"
+							metavar="<Color_system_File>",
 							dest="phylumColor",
-							default=None
+							default=None,
 							help="File the name of the of the phylum and the color for each systems in hexadecimal")
 
-color_option = parser.add_argument_group(title = "Color options")
+args = parser.parse_args()
 
-PREFIX = general_option.prefix
+if not args.prefix :
+	PREFIX = os.path.join(os.path.abspath(args.seqFile),"colorize_%s" %(time.strftime("%d_%m_%y")))
+else :
+	PREFIX = args.prefix
 
 create_folder(os.path.dirname(PREFIX))
 
-FORMAT = general_option.format.lower()
+FORMAT = args.format.lower()
 
-file_name = os.path.abspath(required_options.seqFile)
+file_name = os.path.abspath(args.seqFile)
 
 if FORMAT != "fasta" :
 	file_name_abspath = conversion_alignment(file_name, FORMAT)
 	file_name = file_name_abspath
 
-if not (annotation_option.oldInfo or annotation_option.annotFile):
+if not (args.oldInfo or args.annotFile):
     parser.error("you MUST provided annotation table.")
-elif annotation_option.oldInfo :
-	write_big_new_file(annotation_option.oldInfo, file_name, os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
+elif args.oldInfo :
+	write_big_new_file(args.oldInfo, file_name, os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
 	file_tab = os.path.abspath(os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
-elif general_option.annotFile:
-	file_tab = general_option.annotFile
+elif args.annotFile:
+	file_tab = args.annotFile
 
 tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
 
@@ -472,12 +481,12 @@ tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
 
 if not color_option.sysColor :
-	DICT_COLORSTRIP = create_color_dict("Paired", tab_numpy[:,-1], systems.color)
+	DICT_COLORSTRIP = create_color_dict("Paired", tab_numpy[:,-1], "systems.color")
 else :
 	DICT_COLORSTRIP = read_color_file(color_file)
 
 if not color_option.phylumColor :
-	DICT_COLORSTRIP = create_color_dict("Set3", tab_numpy[:,-2], systems.color)
+	DICT_COLORSTRIP = create_color_dict("Set3", tab_numpy[:,-2], "phylum.color")
 else :
 	DICT_COLORSTRIP = read_color_file(color_file)
 
