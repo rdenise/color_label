@@ -29,3 +29,5 @@ Format color files
 The color files need to be a tabulate separate file with these columns:
 
 name(phylum or system) **[TAB]** color(hexadecimal code)
+
+comments line need to begin by **//**
