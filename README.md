@@ -1,7 +1,4 @@
-# color_label
-
-Colorize
-========
+# Colorize
 
 
 Installation libraries needed
