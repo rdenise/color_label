@@ -71,13 +71,13 @@ def create_colorstrip_itol_file(fileName):
 		writing_file.write("LEGEND_LABELS\t"+"\t".join(DICT_COLORSTRIP.keys())+"\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		for seq in alignment :
 
@@ -131,13 +131,13 @@ def create_colorlabel_itol_file(fileName):
 		writing_file.write("LEGEND_LABELS\tverify\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		for seq in alignment :
 
@@ -182,14 +182,14 @@ def create_colorrange_itol_file(fileName, fileTab):
 		writing_file.write("SEPARATOR SPACE\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 		info_tab = np.loadtxt(fileTab, dtype='string', comments='##', delimiter='\t')
 
 		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		for seq in alignment :
 
@@ -247,14 +247,14 @@ def create_labels_itol_file(fileName, fileTab):
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 		info_tab = np.loadtxt(fileTab, dtype='string', comments='##', delimiter='\t')
 
 		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		for seq in alignment :
 
@@ -305,14 +305,14 @@ def create_labels_itol_file_reverse(fileName, fileTab):
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 		info_tab = np.loadtxt(fileTab, dtype='string', comments='##', delimiter='\t')
 
 		bar = progressbar.ProgressBar(maxval=len(list(alignment)), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
 		progression=1
 		bar.start()
 
-		alignment = SeqIO.parse(os.path.join(PATH_ALIGNEMENT,fileName), "fasta")
+		alignment = SeqIO.parse(fileName, "fasta")
 
 		for seq in alignment :
 
@@ -474,7 +474,7 @@ general_option.add_argument("-f",'--format',
 							dest="format"
 							help="")
 required_options.add_argument("-pre",'--prefix',
- 							default=os.dirname(general_option.seqFile),
+ 							default=os.path.abspath(general_option.seqFile),
 							dest="prefix"
 							metavar='<PREFIX>'
 							help="Using <PREFIX> for output files (default: seqFile directory)")
@@ -489,37 +489,40 @@ annotation_option_option.add_argument("-annot",'--annotationtab',
 							dest="annotFile",
 							help="File with the annotation for each leaf in the tree in rigth format")
 
-if not args.systems:
+
+
+FORMAT = general_option.format.lower()
+
+file_name = os.path.basename(required_options.seqFile)
+PATH_ALIGNEMENT = os.path.dirname(os.path.abspath(required_options.seqFile))
+
+if FORMAT != "fasta" :
+	file_name_abspath = conversion_alignment(os.path.join(PATH_ALIGNEMENT,file_name), FORMAT)
+	file_name = os.path.basename(file_name_abspath)
+
+if not (annotation_option.oldInfo or annotation_option.annotFile):
     parser.error("you MUST provided annotation table.")
+elif annotation_option.oldInfo :
+	write_big_new_file(annotation_option.oldInfo, os.path.join(PATH_ALIGNEMENT,file_name), write_file)
 
-if __name__ == '__main__':
-	if len(sys.argv)!=5:
-		print "Usage : python %s fichier_alignment INFO_TAB myprefix format_alignment." % sys.argv[0]
-		sys.exit(1)
 
-	file_name = os.path.basename(sys.argv[1])
-	PATH_ALIGNEMENT = os.path.dirname(os.path.abspath(sys.argv[1]))
 
-	file_tab = os.path.abspath(sys.argv[2])
+file_tab = os.path.abspath(sys.argv[2])
 
-	NAME_PROTEIN = sys.argv[3]
+NAME_PROTEIN = sys.argv[3]
 
-	FORMAT = sys.argv[4].lower()
 
-	if FORMAT != "fasta" :
-		file_name_abspath = conversion_alignment(os.path.join(PATH_ALIGNEMENT,file_name), FORMAT)
-		file_name = os.path.basename(file_name_abspath)
 
-	create_colorstrip_itol_file(file_name)
+create_colorstrip_itol_file(file_name)
 
-	create_colorlabel_itol_file(file_name)
+create_colorlabel_itol_file(file_name)
 
-	create_colorrange_itol_file(file_name, file_tab)
+create_colorrange_itol_file(file_name, file_tab)
 
-	create_labels_itol_file(file_name, file_tab)
+create_labels_itol_file(file_name, file_tab)
 
-	if FORMAT != "fasta" :
-		os.remove(file_name_abspath)
+if FORMAT != "fasta" :
+	os.remove(file_name_abspath)
 
 PATH_ITOL_FILE = "/Users/rdenise/Documents/Analysis_tree/virb4/label_itol/%s/" % time.strftime("%d_%m_%y")
 
