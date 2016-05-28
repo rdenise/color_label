@@ -1,10 +1,3 @@
-"""
-USAGE ::: python color_label_tree file_name file_tab myprefix format
- file_name : name of the file used for tree (alignement).
- file_tab : tab with the annotation of the leaves.
- myprefix : name of the start of the color file.
- format : format of the alignement file.
-"""
 # -*- coding: utf-8 -*-
 
 
@@ -24,6 +17,7 @@ import numpy as np
 import time
 import re
 import seaborn as sns
+import argparse
 
 ##########################################################################################
 ##########################################################################################
@@ -403,7 +397,7 @@ def create_color_dict(cmap, col_infoTab, name) :
 
 	"""
 
-	color_dir = os.path.join(PATH_ITOL_FILE, "color")
+	color_dir = os.path.join(PATH_ITOL_FILE, "file_color")
 	create_folder(color_dir)
 	uniq_infoTab = np.unique(col_infoTab)
 	uniq_infoTab = np.delete(unique, (uniq_infoTab == "generique"))
@@ -454,6 +448,49 @@ def write_big_new_file(file_tab, files_f, write_file) :
 ##
 ##########################################################################################
 ##########################################################################################
+
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+     description=dedent('''
+
+ XXXXXXX             XX                    XXXXXX          XXXXXXXXX           XXXXXX
+XX          XXXXX    XX          XXXXX    XX    XX  XXXXXX      XXX  XXXXXXXX XX    XX
+XX        XXX   XXX  XX        XXX   XXX  XX     XX   XX       XXX   XX       XX     XX
+XX       XX       XX XX       XX       XX XX    XX    XX      XXX    XX       XX    XX
+XX       XX       XX XX       XX       XX XX XXX      XX     XXX     XXXX     XX XXX
+XX       XX       XX XX       XX       XX XX  XX      XX    XXX      XX       XX  XX
+ XXXXXXX  XXX   XXX   XXXXXXX  XXX   XXX  XX   XXXX   XX   XXXXXXXXX XX       XX   XXXX
+             XXX                  XXX               XXXXXX           XXXXXXXX
+''') )
+
+general_option = parser.add_argument_group(title = "General input dataset options")
+general_option.add_argument("-s",'--seqfile',
+ 							required=True,
+							metavar="<file>"
+							dest="seqFile",
+							help="File with the sequences used for the alignment")
+general_option.add_argument("-f",'--format',
+							required=True,
+							dest="format"
+							help="")
+required_options.add_argument("-pre",'--prefix',
+ 							default=os.dirname(general_option.seqFile),
+							dest="prefix"
+							metavar='<PREFIX>'
+							help="Using <PREFIX> for output files (default: seqFile directory)")
+
+annotation_option = parser.add_argument_group(title = "Table annotation options")
+annotation_option_option.add_argument("-old",'--oldannotation',
+							metavar="<INFO_TAB>"
+							dest="oldInfo",
+							help="File with the annotation for each species in old format")
+annotation_option_option.add_argument("-annot",'--annotationtab',
+							metavar="<ANNOTATION_TAB>"
+							dest="annotFile",
+							help="File with the annotation for each leaf in the tree in rigth format")
+
+if not args.systems:
+    parser.error("you MUST provided annotation table.")
 
 if __name__ == '__main__':
 	if len(sys.argv)!=5:
