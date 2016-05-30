@@ -24,6 +24,8 @@ old annotation table format
 
 species_id **[TAB]** full_name_of_the_species **[TAB]** kingdom **[TAB]** phyllum
 
+and comment begin with **##**
+
 Format color files
 ------------------
 The color files need to be a tabulate separate file with these columns:
