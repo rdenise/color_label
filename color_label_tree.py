@@ -393,7 +393,7 @@ def write_big_new_file(file_tab, file_f, write_file) :
 
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-     description=dedent('''
+     description=dedent("""
 
 
 ---------------------------------------------------------------------------------------
@@ -408,7 +408,7 @@ XX       XX       XX XX       XX       XX XX  XX      XX    XXX      XX       XX
              XXX                  XXX               XXXXXX           XXXXXXXX
 
 ---------------------------------------------------------------------------------------
-''') )
+""") )
 
 general_option = parser.add_argument_group(title = "General input dataset options")
 general_option.add_argument("-s",'--seqfile',
