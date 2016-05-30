@@ -9,11 +9,7 @@ Installation libraries needed
 
     pip install biopython
 
-2. Seaborn
-
-    pip install seaborn
-
-3. progressbar
+2. progressbar
 
     pip install progressbar
 

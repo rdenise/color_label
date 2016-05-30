@@ -16,7 +16,8 @@ import os
 import numpy as np
 import time
 import re
-import seaborn as sns
+import matplotlib.cm as cm
+import matplotlib.colors as colors
 import argparse
 from textwrap import dedent
 
@@ -274,6 +275,35 @@ def create_labels_itol_file_reverse(info_tab):
 ##########################################################################################
 ##########################################################################################
 
+def get_color_cmap(name, n_colors=6):
+
+	"""
+	Return discrete colors from a matplotlib palette.
+
+	:param name: Name of the palette. This should be a named matplotlib colormap.
+	:type: str
+    :param n_colors: Number of discrete colors in the palette.
+	:type: int
+	:return: List-like object of colors as hexadecimal tuples
+	:type: list
+    """
+
+	brewer_qual_pals = {"Accent": 8, "Dark2": 8, "Paired": 12,
+	                    "Pastel1": 9, "Pastel2": 8,
+	                    "Set1": 9, "Set2": 8, "Set3": 12}
+
+	cmap = getattr(cm, name)
+	if name in brewer_qual_pals:
+	    bins = np.linspace(0, 1, brewer_qual_pals[name])[:n_colors]
+	else:
+	    bins = np.linspace(0, 1, n_colors + 2)[1:-1]
+	palette = list(map(tuple, cmap(bins)[:, :3]))
+
+	return [colors.rgb2hex(rgb) for rgb in palette]
+
+
+##########################################################################################
+##########################################################################################
 
 def conversion_alignment(alignment_file, format):
 
@@ -340,7 +370,7 @@ def create_color_dict(cmap, col_infoTab, name) :
 	create_folder(color_dir)
 	uniq_infoTab = np.unique(col_infoTab)
 	uniq_infoTab = uniq_infoTab[uniq_infoTab != "generique"]
-	my_color = sns.color_palette(cmap, len(uniq_infoTab)).as_hex()
+	my_color = get_color_cmap(cmap, len(uniq_infoTab))
 	uniq_infoTab = np.c_[uniq_infoTab, my_color]
 	np.savetxt(os.path.join(color_dir, name), uniq_infoTab, delimiter='\t', fmt='%s')
 	return {line[0]:line[1] for line in uniq_infoTab}
