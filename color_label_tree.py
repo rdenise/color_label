@@ -298,7 +298,8 @@ def get_color_cmap(name, n_colors=6):
 	else:
 	    bins = np.linspace(0, 1, n_colors + 2)[1:-1]
 	palette = list(map(tuple, cmap(bins)[:, :3]))
-
+	pal_cycle = cycle(palette)
+	palette = [next(pal_cycle) for _ in range(n_colors)]
 	return [colors.rgb2hex(rgb) for rgb in palette]
 
 
