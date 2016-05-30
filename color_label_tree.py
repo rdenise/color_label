@@ -514,12 +514,12 @@ tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
 if not args.sysColor :
 	DICT_COLORSTRIP = create_color_dict("nipy_spectral", tab_numpy[:,-1], "systems.color")
 else :
-	DICT_COLORSTRIP = read_color_file(color_file)
+	DICT_COLORSTRIP = read_color_file(args.sysColor)
 
 if not args.phylumColor :
 	DICT_COLORRANGE = create_color_dict("Paired", tab_numpy[:,-2], "phylum.color")
 else :
-	DICT_COLORRANGE = read_color_file(color_file)
+	DICT_COLORRANGE = read_color_file(args.phylumColor)
 
 # Appel des fonctions
 ######
