@@ -11,7 +11,6 @@
 
 from Bio import SeqIO, AlignIO
 import sys
-import progressbar
 import os
 import numpy as np
 import time
@@ -72,23 +71,20 @@ def create_colorstrip_itol_file(info_tab):
 		writing_file.write("LEGEND_LABELS\t"+"\t".join(DICT_COLORSTRIP.keys())+"\n")
 		writing_file.write("DATA\n")
 
-
-		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-		progression=1
-		bar.start()
-
+		progression=0
 
 		for seq in info_tab :
 
-			bar.update(progression)
-			progression +=1
+			progression += 1
+			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.flush()
 
 			if "generique" in seq[0] or "choice" in seq[0]:
 				continue
 			else:
 				writing_file.write(seq[0]+"\t"+DICT_COLORSTRIP[seq[-1]]+"\n")
-	bar.finish()
 
+	print("Done !")
 	return
 
 ##########################################################################################
@@ -122,24 +118,20 @@ def create_binary_itol_file(info_tab):
 		writing_file.write("LEGEND_LABELS\tverify\n")
 		writing_file.write("DATA\n")
 
-
-		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-		progression=1
-		bar.start()
-
+		progression = 0
 
 		for seq in info_tab :
 
-			bar.update(progression)
-			progression +=1
+			progression += 1
+			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.flush()
 
 			if "_V_" in seq[0] :
 				writing_file.write(seq[0]+"\t1\n")
 			else :
 				writing_file.write(seq[0]+"\t0\n")
 
-	bar.finish()
-
+	print("Done !")
 	return
 
 ##########################################################################################
@@ -166,15 +158,13 @@ def create_colorrange_itol_file(info_tab):
 		writing_file.write("SEPARATOR SPACE\n")
 		writing_file.write("DATA\n")
 
-		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-		progression=1
-		bar.start()
-
+		progression = 0
 
 		for seq in info_tab :
 
-			bar.update(progression)
-			progression +=1
+			progression += 1
+			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.flush()
 
 			lineage = seq[-2]
 
@@ -185,8 +175,7 @@ def create_colorrange_itol_file(info_tab):
 			else :
 				writing_file.write(seq[0]+" range "+DICT_COLORRANGE["Bacteria"]+" Bacteria\n")
 
-	bar.finish()
-
+	print("Done !")
 	return
 
 ##########################################################################################
@@ -214,20 +203,17 @@ def create_labels_itol_file(info_tab):
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-		progression=1
-		bar.start()
-
+		progression=0
 
 		for seq in info_tab :
 
-			bar.update(progression)
-			progression +=1
+			progression += 1
+			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.flush()
 
 			writing_file.write(seq[0]+"\t"+seq[2]+"\n")
 
-	bar.finish()
-
+	print("Done !")
 	return
 
 
@@ -256,15 +242,13 @@ def create_labels_itol_file_reverse(info_tab):
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		bar = progressbar.ProgressBar(maxval=info_tab.shape[0], widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-		progression=1
-		bar.start()
-
+		progression=0
 
 		for seq in info_tab :
 
-			bar.update(progression)
-			progression +=1
+			progression += 1
+			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.flush()
 
 			writing_file.write(seq[2]+"\t"+seq[0]+"\n")
 

@@ -9,11 +9,6 @@ Installation libraries needed
 
     pip install biopython
 
-2. progressbar
-
-    pip install progressbar
-
-
 Format annotation file
 ----------------------
 The annotation file need to be a tabulate separate file with these columns:
