@@ -1,13 +1,14 @@
 # Colorize
 
-Script to construct colorstrip, colorrange or binary file
+Script to construct colorstrip, colorrange or binary file in Itol Format
 
-Installation libraries needed
------------------------------
+Dependencies :
+--------------
 
-1. Biopython
-
-    pip install biopython
+- Python 2.7
+   - Numpy 1.9.1
+   - Biopython 1.65
+   - Matplotlib 1.4.3
 
 Format annotation file
 ----------------------
