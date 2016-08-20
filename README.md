@@ -9,7 +9,6 @@ Dependencies :
    - Numpy 1.9.1
    - Biopython 1.65
    - Matplotlib 1.4.3
-   - Argparse 1.1
 
 Format annotation file
 ----------------------
