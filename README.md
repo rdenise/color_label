@@ -1,4 +1,4 @@
-# Colorize
+# Colorizer
 
 Script to construct colorstrip, colorrange or binary file in Itol Format
 
