@@ -406,23 +406,23 @@ def write_big_new_file(file_tab, file_f, write_file) :
 ##########################################################################################
 ##########################################################################################
 
+# NOTE J'ai trouver le dessin pour le nom sur : http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
      description=dedent("""
 
 
----------------------------------------------------------------------------------------
+-----------------------------------------
 
- XXXXXXX             XX                    XXXXXX          XXXXXXXXX           XXXXXX
-XX          XXXXX    XX          XXXXX    XX    XX  XXXXXX      XXX  XXXXXXXX XX    XX
-XX        XXX   XXX  XX        XXX   XXX  XX     XX   XX       XXX   XX       XX     XX
-XX       XX       XX XX       XX       XX XX    XX    XX      XXX    XX       XX    XX
-XX       XX       XX XX       XX       XX XX XXX      XX     XXX     XXXX     XX XXX
-XX       XX       XX XX       XX       XX XX  XX      XX    XXX      XX       XX  XX
- XXXXXXX  XXX   XXX   XXXXXXX  XXX   XXX  XX   XXXX   XX   XXXXXXXXX XX       XX   XXXX
-             XXX                  XXX               XXXXXX           XXXXXXXX
+ _____       _            _
+/  __ \     | |          (_)
+| /  \/ ___ | | ___  _ __ _ _______ _ __
+| |    / _ \| |/ _ \| '__| |_  / _ \ '__|
+| \__/\ (_) | | (_) | |  | |/ /  __/ |
+ \____/\___/|_|\___/|_|  |_/___\___|_|   
 
----------------------------------------------------------------------------------------
+
+-----------------------------------------
 """) )
 
 general_option = parser.add_argument_group(title = "General input dataset options")
