@@ -13,12 +13,9 @@ from Bio import SeqIO, AlignIO
 import sys
 import os
 import numpy as np
-import time
 import re
 import matplotlib.cm as cm
 import matplotlib.colors as colors
-import argparse
-from textwrap import dedent
 
 ##########################################################################################
 ##########################################################################################
@@ -76,10 +73,10 @@ def create_colorstrip_itol_file(info_tab):
 		for seq in info_tab :
 
 			progression += 1
-			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
-			if "generique" in seq[0] or "choice" in seq[0]:
+			if "generic" in seq[0] or "choice" in seq[0] or "generique" in seq[0]:
 				continue
 			else:
 				writing_file.write(seq[0]+"\t"+DICT_COLORSTRIP[seq[-1]]+"\n")
@@ -123,7 +120,7 @@ def create_binary_itol_file(info_tab):
 		for seq in info_tab :
 
 			progression += 1
-			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
 			if "_V_" in seq[0] :
@@ -163,7 +160,7 @@ def create_colorrange_itol_file(info_tab):
 		for seq in info_tab :
 
 			progression += 1
-			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
 			lineage = seq[-2]
@@ -208,7 +205,7 @@ def create_labels_itol_file(info_tab):
 		for seq in info_tab :
 
 			progression += 1
-			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
 			writing_file.write(seq[0]+"\t"+seq[2]+"\n")
@@ -247,7 +244,7 @@ def create_labels_itol_file_reverse(info_tab):
 		for seq in info_tab :
 
 			progression += 1
-			sys.stdout.write("%.2f : %i/%i sequences\r" %(progression/float(info_tab.shape[0]), progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
 			writing_file.write(seq[2]+"\t"+seq[0]+"\n")
@@ -354,7 +351,7 @@ def create_color_dict(cmap, col_infoTab, name) :
 	color_dir = os.path.join(os.path.dirname(PREFIX), "file_color")
 	create_folder(color_dir)
 	uniq_infoTab = np.unique(col_infoTab)
-	uniq_infoTab = uniq_infoTab[uniq_infoTab != "generique"]
+	uniq_infoTab = uniq_infoTab[uniq_infoTab != "generic"]
 	my_color = get_color_cmap(cmap, len(uniq_infoTab))
 	uniq_infoTab = np.c_[uniq_infoTab, my_color]
 	np.savetxt(os.path.join(color_dir, name), uniq_infoTab, delimiter='\t', fmt='%s')
@@ -380,7 +377,7 @@ def write_big_new_file(file_tab, file_f, write_file) :
 	tab_info = np.loadtxt(file_tab, delimiter="\t", dtype="string", comments="##")
 
 	with open(write_file, "w") as w_file :
-		line = "#%s\t%s\t%s\t%s\t%s\t%s\n" % ("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
+		line = "#{}\t{}\t{}\t{}\t{}\t{}\n".format("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
 		w_file.write(line)
 		for seq in SeqIO.parse(file_f, format="fasta") :
 			if "NC_" in seq.id :
@@ -394,130 +391,5 @@ def write_big_new_file(file_tab, file_f, write_file) :
 				system_name = seq.id.split("_")[seq.id.split("_").index("V")-1]
 
 			index_species = tab_info[:,0].tolist().index(name_species)
-			line = "%s\t%s\t%s\t%s\t%s\t%s\n" % (seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
+			line = "{}\t{}\t{}\t{}\t{}\t{}\n".format(seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
 			w_file.write(line)
-
-
-##########################################################################################
-##########################################################################################
-##
-##								Main
-##
-##########################################################################################
-##########################################################################################
-
-# NOTE J'ai trouver le dessin pour le nom sur : http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
-
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-     description=dedent("""
-
-
------------------------------------------
-
- _____       _            _
-/  __ \     | |          (_)
-| /  \/ ___ | | ___  _ __ _ _______ _ __
-| |    / _ \| |/ _ \| '__| |_  / _ \ '__|
-| \__/\ (_) | | (_) | |  | |/ /  __/ |
- \____/\___/|_|\___/|_|  |_/___\___|_|   
-
-
------------------------------------------
-""") )
-
-general_option = parser.add_argument_group(title = "General input dataset options")
-general_option.add_argument("-s",'--seqfile',
- 							required=True,
-							metavar="<file>",
-							dest="seqFile",
-							help="File with the sequences used for the alignment")
-general_option.add_argument("-f",'--format',
-							required=True,
-							dest="format",
-							help="")
-general_option.add_argument("-pre",'--prefix',
- 							default=None,
-							dest="prefix",
-							metavar='<PREFIX>',
-							help="Using <PREFIX> for output files (default: seqFile directory)")
-
-annotation_option = parser.add_argument_group(title = "Table annotation options")
-annotation_option.add_argument("-old",'--oldannotation',
-							metavar="<INFO_TAB>",
-							dest="oldInfo",
-							default=None,
-							help="File with the annotation for each species in old format")
-annotation_option.add_argument("-annot",'--annotationtab',
-							metavar="<ANNOTATION_TAB>",
-							dest="annotFile",
-							default=None,
-							help="File with the annotation for each leaf in the tree in rigth format")
-
-color_option = parser.add_argument_group(title = "Color options")
-color_option.add_argument("-sysCo",'--systemsColor',
-							metavar="<Color_system_File>",
-							dest="sysColor",
-							default=None,
-							help="File the name of the of the systems and the color for each systems in hexadecimal")
-color_option.add_argument("-phyCo",'--phylumColor',
-							metavar="<Color_system_File>",
-							dest="phylumColor",
-							default=None,
-							help="File the name of the of the phylum and the color for each systems in hexadecimal")
-
-args = parser.parse_args()
-
-if not args.prefix :
-	PREFIX = os.path.join(os.path.abspath(args.seqFile),"colorize_%s" %(time.strftime("%d_%m_%y")))
-else :
-	PREFIX = args.prefix
-
-create_folder(os.path.dirname(PREFIX))
-
-FORMAT = args.format.lower()
-
-file_name = os.path.abspath(args.seqFile)
-
-if FORMAT != "fasta" :
-	file_name_abspath = conversion_alignment(file_name, FORMAT)
-	file_name = file_name_abspath
-
-if not (args.oldInfo or args.annotFile):
-    parser.error("you MUST provided annotation table.")
-elif args.oldInfo :
-	write_big_new_file(args.oldInfo, file_name, os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
-	file_tab = os.path.abspath(os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
-elif args.annotFile:
-	file_tab = args.annotFile
-
-tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
-
-#Paired bon pour les systemes < 12 sinon nipy_spectral
-#Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
-
-if not args.sysColor :
-	DICT_COLORSTRIP = create_color_dict("nipy_spectral", tab_numpy[:,-1], "systems.color")
-else :
-	DICT_COLORSTRIP = read_color_file(args.sysColor)
-
-if not args.phylumColor :
-	DICT_COLORRANGE = create_color_dict("Paired", tab_numpy[:,-2], "phylum.color")
-else :
-	DICT_COLORRANGE = read_color_file(args.phylumColor)
-
-# Appel des fonctions
-######
-
-create_colorstrip_itol_file(tab_numpy)
-
-create_binary_itol_file(tab_numpy)
-
-create_colorrange_itol_file(tab_numpy)
-
-create_labels_itol_file(tab_numpy)
-
-######
-# Fin des fonctions
-
-if FORMAT != "fasta" :
-	os.remove(file_name_abspath)
