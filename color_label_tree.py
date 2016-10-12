@@ -324,7 +324,7 @@ def read_color_file(color_file) :
 	"""
 
 
- 	my_color = np.loadtxt(color_file, delimiter="\t", comments="//", dtype="string")
+	my_color = np.loadtxt(color_file, delimiter="\t", comments="//", dtype="string")
 	return {line[0]:line[1] for line in my_color}
 
 ##########################################################################################
