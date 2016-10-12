@@ -53,9 +53,9 @@ def create_colorstrip_itol_file(info_tab):
 	:return: Nothing
 	"""
 
-	print("\n#################")
-	print("# COLOR STRIP FILE")
-	print("#################\n")
+	print "\n#################"
+	print "# COLOR STRIP FILE"
+	print "#################\n"
 
 	with open(PREFIX+"_colorstrip.txt", 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
@@ -98,9 +98,9 @@ def create_binary_itol_file(info_tab):
 	:return: Nothing
 	"""
 
-	print("\n#################")
-	print("# LABEL BINARY FILE")
-	print("#################\n")
+	print "\n#################"
+	print "# LABEL BINARY FILE"
+	print "#################\n"
 
 	with open(PREFIX+"_labelbinary.txt", 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
@@ -146,9 +146,9 @@ def create_colorrange_itol_file(info_tab):
 	:return: Nothing
 	"""
 
-	print("\n#################")
-	print("# COLOR RANGE FILE")
-	print("#################\n")
+	print "\n#################"
+	print "# COLOR RANGE FILE"
+	print "#################\n"
 
 	with open(PREFIX+"_colorrange.txt", 'w') as writing_file:
 		writing_file.write("TREE_COLORS\n")
@@ -191,9 +191,9 @@ def create_labels_itol_file(info_tab):
 	:return: Nothing
 	"""
 
-	print("\n#################")
-	print("# LABELS FILE")
-	print("#################\n")
+	print "\n#################"
+	print "# LABELS FILE"
+	print "#################\n"
 
 	with open(PREFIX+"_id_label.txt", 'w') as writing_file:
 		writing_file.write("LABELS\n")
@@ -230,9 +230,9 @@ def create_labels_itol_file_reverse(info_tab):
 	:return: Nothing
 	"""
 
-	print("\n#################")
-	print("# LABELS REVERSE FILE")
-	print("#################\n")
+	print "\n#################"
+	print "# LABELS REVERSE FILE"
+	print "#################\n"
 
 	with open(PREFIX+"_id_label_reverse.txt", 'w') as writing_file:
 		writing_file.write("LABELS\n")
@@ -249,7 +249,8 @@ def create_labels_itol_file_reverse(info_tab):
 
 			writing_file.write(seq[2]+"\t"+seq[0]+"\n")
 
-	print("Done !")
+	bar.finish()
+
 	return
 
 ##########################################################################################
@@ -392,4 +393,3 @@ def write_big_new_file(file_tab, file_f, write_file) :
 			index_species = tab_info[:,0].tolist().index(name_species)
 			line = "{}\t{}\t{}\t{}\t{}\t{}\n".format(seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
 			w_file.write(line)
-	return
