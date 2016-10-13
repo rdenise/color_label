@@ -379,7 +379,7 @@ def write_big_new_file(file_tab, file_f, write_file) :
 		line = "#{}\t{}\t{}\t{}\t{}\t{}\n".format("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
 		w_file.write(line)
 		for seq in SeqIO.parse(file_f, format="fasta") :
-			if "NC_" in seq.id :
+			if "NC_" == seq.id[:3] :
 				name_species = "_".join(seq.id.split("_")[:2])
 				if 'T4SS' in seq.id :
 					system_name = re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)
@@ -387,7 +387,14 @@ def write_big_new_file(file_tab, file_f, write_file) :
 					system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
 			else :
 				name_species = seq.id.split("_")[0][:4]
-				system_name = seq.id.split("_")[seq.id.split("_").index("V")-1]
+				# NOTE Si gembase retourne au code 2013 
+				if "_D_" in seq.id :
+					if "T4SS" in seq.id :
+						system_name = re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)
+					else:
+						system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
+				else :
+					system_name = seq.id.split("_")[seq.id.split("_").index("V")-1]
 
 			index_species = tab_info[:,0].tolist().index(name_species)
 			line = "{}\t{}\t{}\t{}\t{}\t{}\n".format(seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
