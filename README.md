@@ -5,10 +5,10 @@ Script to construct colorstrip, colorrange or binary file in Itol Format
 Dependencies :
 --------------
 
-- Python 2.7
-   - Numpy 1.9.1
-   - Biopython 1.65
-   - Matplotlib 1.4.3
+- Python 2.7 or Python 3.5
+   - Numpy 1.11.2
+   - Biopython 1.68
+   - Matplotlib 1.5.3
 
 Format annotation file
 ----------------------
