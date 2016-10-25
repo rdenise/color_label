@@ -81,7 +81,7 @@ def create_colorstrip_itol_file(info_tab):
 			if "generic" in seq[0] or "choice" in seq[0] or "generique" in seq[0]:
 				continue
 			else:
-				writing_file.write(seq[0]+"\t"+DICT_COLORSTRIP[seq[-1]]+"\n")
+				writing_file.write("{}\t{}\n".format(seq[0], DICT_COLORSTRIP[seq[-1]])
 
 	print("Done !")
 	return
@@ -126,9 +126,9 @@ def create_binary_itol_file(info_tab):
 			sys.stdout.flush()
 
 			if "_V_" in seq[0] :
-				writing_file.write(seq[0]+"\t1\n")
+				writing_file.write("{}\t1\n".format(seq[0]))
 			else :
-				writing_file.write(seq[0]+"\t0\n")
+				writing_file.write("{}\t0\n".format(seq[0]))
 
 	print("Done !")
 	return
@@ -210,7 +210,7 @@ def create_labels_itol_file(info_tab):
 			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
-			writing_file.write(seq[0]+"\t"+seq[2]+"\n")
+			writing_file.write("{}\t{}\n".format(seq[0],seq[2])
 
 	print("Done !")
 	return
@@ -249,7 +249,7 @@ def create_labels_itol_file_reverse(info_tab):
 			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
-			writing_file.write(seq[2]+"\t"+seq[0]+"\n")
+			writing_file.write("{}\t{}\n".format(seq[2],seq[0])
 
 	print("Done !")
 	return
@@ -389,7 +389,7 @@ def write_big_new_file(file_tab, file_f, write_file) :
 					system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
 			else :
 				name_species = seq.id.split("_")[0][:4]
-				# NOTE Si gembase retourne au code 2013 
+				# NOTE Si gembase retourne au code 2013
 				if "_D_" in seq.id :
 					if "T4SS" in seq.id :
 						system_name = re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)
