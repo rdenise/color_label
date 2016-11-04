@@ -99,7 +99,7 @@ elif args.oldInfo :
 elif args.annotFile:
 	file_tab = args.annotFile
 
-tab_numpy = np.loadtxt(file_tab, delimiter="\t", dtype="string")
+tab_numpy = np.genfromtxt(file_tab, delimiter="\t", dtype="str")
 
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
@@ -117,13 +117,13 @@ else :
 # Appel des fonctions
 ######
 
-create_colorstrip_itol_file(tab_numpy)
+create_colorstrip_itol_file(tab_numpy, PREFIX, DICT_COLORSTRIP)
 
-create_binary_itol_file(tab_numpy)
+create_binary_itol_file(tab_numpy, PREFIX)
 
-create_colorrange_itol_file(tab_numpy)
+create_colorrange_itol_file(tab_numpy, PREFIX, DICT_COLORRANGE)
 
-create_labels_itol_file(tab_numpy)
+create_labels_itol_file(tab_numpy, PREFIX)
 
 ######
 # Fin des fonctions

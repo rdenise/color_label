@@ -30,7 +30,7 @@ def create_folder(mypath):
 	"""
 	Created the folder that I need to store my result if it doesn't exist
 	:param mypath: path where I want the folder (write at the end of the path)
-	:type: string
+	:type: str
 	:return: Nothing
 	"""
 
@@ -44,14 +44,18 @@ def create_folder(mypath):
 ##########################################################################################
 ##########################################################################################
 
-def create_colorstrip_itol_file(info_tab):
+def create_colorstrip_itol_file(info_tab, PREFIX, DICT_COLORSTRIP):
 
 	"""
 	Function that create a file in itol colorstrip format for the sequence in the info_tab
-	with color for each kind of
+	with color for each kind of systems
 
 	:param info_tab: table of the annotation table
 	:type: numpy.ndarray
+	:param PREFIX: path and begin (prefix) of the new file name
+	:type: str
+	:param DICT_COLORRANGE: dictionnary that contain the name of the systems with a color associate
+	:type: dict
 	:return: Nothing
 	"""
 
@@ -83,13 +87,14 @@ def create_colorstrip_itol_file(info_tab):
 			else:
 				writing_file.write("{}\t{}\n".format(seq[0], DICT_COLORSTRIP[seq[-1]]))
 
+	print()
 	print("Done !")
 	return
 
 ##########################################################################################
 ##########################################################################################
 
-def create_binary_itol_file(info_tab):
+def create_binary_itol_file(info_tab, PREFIX):
 
 	"""
 	Function that create a file in itol color label format for the sequence in the info_tab
@@ -97,6 +102,8 @@ def create_binary_itol_file(info_tab):
 
 	:param info_tab: table of the annotation table
 	:type: numpy.ndarray
+	:param PREFIX: path and begin (prefix) of the new file name
+	:type: str
 	:return: Nothing
 	"""
 
@@ -130,6 +137,7 @@ def create_binary_itol_file(info_tab):
 			else :
 				writing_file.write("{}\t0\n".format(seq[0]))
 
+	print()
 	print("Done !")
 	return
 
@@ -138,13 +146,18 @@ def create_binary_itol_file(info_tab):
 
 
 
-def create_colorrange_itol_file(info_tab):
+def create_colorrange_itol_file(info_tab, PREFIX, DICT_COLORRANGE):
 
 	"""
 	Function that create a file in itol color range format for the sequence in the info_tab
 	and with color for each kingdom or subkingdom
+
 	:param info_tab: table of the annotation table
 	:type: numpy.ndarray
+	:param PREFIX: path and begin (prefix) of the new file name
+	:type: str
+	:param DICT_COLORRANGE: dictionnary that contain the name of the phylum with a color associate
+	:type: dict
 	:return: Nothing
 	"""
 
@@ -174,6 +187,7 @@ def create_colorrange_itol_file(info_tab):
 			else :
 				writing_file.write(seq[0]+" range "+DICT_COLORRANGE["Bacteria"]+" Bacteria\n")
 
+	print()
 	print("Done !")
 	return
 
@@ -182,7 +196,7 @@ def create_colorrange_itol_file(info_tab):
 
 
 
-def create_labels_itol_file(info_tab):
+def create_labels_itol_file(info_tab, PREFIX):
 
 
 	"""
@@ -190,6 +204,8 @@ def create_labels_itol_file(info_tab):
 
 	:param info_tab: table of the annotation table
 	:type: numpy.ndarray
+	:param PREFIX: path and begin (prefix) of the new file name
+	:type: str
 	:return: Nothing
 	"""
 
@@ -212,6 +228,7 @@ def create_labels_itol_file(info_tab):
 
 			writing_file.write("{}\t{}\n".format(seq[0],seq[2]))
 
+	print()
 	print("Done !")
 	return
 
@@ -221,7 +238,7 @@ def create_labels_itol_file(info_tab):
 
 
 
-def create_labels_itol_file_reverse(info_tab):
+def create_labels_itol_file_reverse(info_tab, PREFIX):
 
 
 	"""
@@ -229,6 +246,8 @@ def create_labels_itol_file_reverse(info_tab):
 
 	:param info_tab: table of the annotation table
 	:type: numpy.ndarray
+	:param PREFIX: path and begin (prefix) of the new file name
+	:type: str
 	:return: Nothing
 	"""
 
@@ -251,6 +270,7 @@ def create_labels_itol_file_reverse(info_tab):
 
 			writing_file.write("{}\t{}\n".format(seq[2],seq[0]))
 
+	print()
 	print("Done !")
 	return
 
@@ -326,7 +346,7 @@ def read_color_file(color_file) :
 	"""
 
 
-	my_color = np.loadtxt(color_file, delimiter="\t", comments="//", dtype="string")
+	my_color = np.genfromtxt(color_file, delimiter="\t", comments="//", dtype="str")
 	return {line[0]:line[1] for line in my_color}
 
 ##########################################################################################
@@ -375,7 +395,7 @@ def write_big_new_file(file_tab, file_f, write_file) :
 	:type: str
 	"""
 
-	tab_info = np.loadtxt(file_tab, delimiter="\t", dtype="string", comments="##")
+	tab_info = np.genfromtxt(file_tab, delimiter="\t", dtype="str", comments="##")
 
 	with open(write_file, "w") as w_file :
 		line = "#{}\t{}\t{}\t{}\t{}\t{}\n".format("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
