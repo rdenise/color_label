@@ -81,7 +81,7 @@ def create_colorstrip_itol_file(info_tab):
 			if "generic" in seq[0] or "choice" in seq[0] or "generique" in seq[0]:
 				continue
 			else:
-				writing_file.write("{}\t{}\n".format(seq[0], DICT_COLORSTRIP[seq[-1]])
+				writing_file.write("{}\t{}\n".format(seq[0], DICT_COLORSTRIP[seq[-1]]))
 
 	print("Done !")
 	return
@@ -210,7 +210,7 @@ def create_labels_itol_file(info_tab):
 			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
-			writing_file.write("{}\t{}\n".format(seq[0],seq[2])
+			writing_file.write("{}\t{}\n".format(seq[0],seq[2]))
 
 	print("Done !")
 	return
@@ -249,7 +249,7 @@ def create_labels_itol_file_reverse(info_tab):
 			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
 			sys.stdout.flush()
 
-			writing_file.write("{}\t{}\n".format(seq[2],seq[0])
+			writing_file.write("{}\t{}\n".format(seq[2],seq[0]))
 
 	print("Done !")
 	return
