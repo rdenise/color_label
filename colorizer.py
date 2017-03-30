@@ -44,23 +44,25 @@ general_option.add_argument("-f",'--format',
 							required=True,
 							dest="format",
 							help="")
-general_option.add_argument("-pre",'--prefix',
+general_option.add_argument("-o",'--output',
  							default=None,
-							dest="prefix",
-							metavar='<PREFIX>',
-							help="Using <PREFIX> for output files (default: seqFile directory)")
+							dest="output",
+							metavar='<FOLDER>',
+							help="Using <FOLDER> for output files (default: seqFile directory)")
 
 annotation_option = parser.add_argument_group(title = "Table annotation options")
-annotation_option.add_argument("-old",'--oldannotation',
-							metavar="<INFO_TAB>",
-							dest="oldInfo",
-							default=None,
-							help="File with the annotation for each species in old format")
 annotation_option.add_argument("-annot",'--annotationtab',
 							metavar="<ANNOTATION_TAB>",
 							dest="annotFile",
 							default=None,
+							required=True,
 							help="File with the annotation for each leaf in the tree in rigth format")
+annotation_option.add_argument("-add_col",'--add_columns',
+							metavar="<COLUMN_NAME>",
+							dest="add_columns",
+							nargs="+",
+							default=None,
+							help="Add columns to set binary with it, each columns need to be in the annotation table with 'Yes' or 'No' values for each nodes")
 
 color_option = parser.add_argument_group(title = "Color options")
 color_option.add_argument("-sysCo",'--systemsColor',
@@ -76,54 +78,59 @@ color_option.add_argument("-phyCo",'--phylumColor',
 
 args = parser.parse_args()
 
-if not args.prefix :
-	PREFIX = os.path.join(os.path.abspath(args.seqFile),"colorize_%s" %(time.strftime("%d_%m_%y")))
+if not args.output :
+	OUTPUT = os.path.join(os.path.abspath(args.seqFile),"colorize_{}".format(time.strftime("%d_%m_%y")))
 else :
-	PREFIX = args.prefix
+	OUTPUT = args.output
 
-create_folder(os.path.dirname(PREFIX))
+create_folder(OUTPUT)
 
 FORMAT = args.format.lower()
 
 file_name = os.path.abspath(args.seqFile)
+all_leafs = list(SeqIO.to_dict(SeqIO.parse(file_name, 'fasta')).keys())
 
 if FORMAT != "fasta" :
 	file_name_abspath = conversion_alignment(file_name, FORMAT)
 	file_name = file_name_abspath
 
-if not (args.oldInfo or args.annotFile):
-    parser.error("you MUST provided annotation table.")
-elif args.oldInfo :
-	write_big_new_file(args.oldInfo, file_name, os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
-	file_tab = os.path.abspath(os.path.join(os.path.dirname(PREFIX),"ANNOTATION_TAB"))
-elif args.annotFile:
-	file_tab = args.annotFile
+file_tab = args.annotFile
 
-tab_numpy = np.genfromtxt(file_tab, delimiter="\t", dtype="str")
+df_tab = pd.read_table(file_tab)
+df_tab = df_tab[df_tab.NewName.isin(all_leafs)].reset_index(drop=True)
+#tab_numpy = np.genfromtxt(file_tab, delimiter="\t", dtype="str")
 
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
 
 if not args.sysColor :
-	DICT_COLORSTRIP = create_color_dict("nipy_spectral", tab_numpy[:,-1], "systems.color")
+	DICT_COLORSTRIP = create_color_dict("nipy_spectral", df_tab.Predicted_System, "systems.color")
 else :
 	DICT_COLORSTRIP = read_color_file(args.sysColor)
 
 if not args.phylumColor :
-	DICT_COLORRANGE = create_color_dict("Paired", tab_numpy[:,-2], "phylum.color")
+	DICT_COLORRANGE = create_color_dict("Paired", df_tab.Phylum, "phylum.color")
 else :
 	DICT_COLORRANGE = read_color_file(args.phylumColor)
 
 # Appel des fonctions
 ######
 
-create_colorstrip_itol_file(tab_numpy, PREFIX, DICT_COLORSTRIP)
+create_colorstrip_itol_file(df_tab, OUTPUT, DICT_COLORSTRIP)
 
-create_binary_itol_file(tab_numpy, PREFIX)
+create_binary_itol_file(df_tab, OUTPUT)
 
-create_colorrange_itol_file(tab_numpy, PREFIX, DICT_COLORRANGE)
+create_colorrange_itol_file(df_tab, OUTPUT, DICT_COLORRANGE)
 
-create_labels_itol_file(tab_numpy, PREFIX)
+if args.add_columns :
+	number_of_columns = len(args.add_columns)
+	if number_of_columns <= 5 :
+		colors = ['#5d3f87', '#1a4c90','#d93230','#0b7d3d', '#d2b7b1'][:number_of_columns]
+	else :
+		colors = get_color_cmap("Paired", number_of_columns)
+	create_binary_itol_file_auto(df_tab, OUTPUT, args.add_columns, colors)
+
+#create_labels_itol_file(df_tab, OUTPUT)
 
 ######
 # Fin des fonctions

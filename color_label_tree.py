@@ -13,6 +13,7 @@ from Bio import SeqIO, AlignIO
 import sys
 import os
 import numpy as np
+import pandas as pd
 import re
 import matplotlib.cm as cm
 import matplotlib.colors as colors
@@ -44,15 +45,15 @@ def create_folder(mypath):
 ##########################################################################################
 ##########################################################################################
 
-def create_colorstrip_itol_file(info_tab, PREFIX, DICT_COLORSTRIP):
+def create_colorstrip_itol_file(info_df, PREFIX, DICT_COLORSTRIP):
 
 	"""
-	Function that create a file in itol colorstrip format for the sequence in the info_tab
+	Function that create a file in itol colorstrip format for the sequence in the info_df
 	with color for each kind of systems
 
-	:param info_tab: table of the annotation table
-	:type: numpy.ndarray
-	:param PREFIX: path and begin (prefix) of the new file name
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
 	:type: str
 	:param DICT_COLORRANGE: dictionnary that contain the name of the systems with a color associate
 	:type: dict
@@ -63,29 +64,21 @@ def create_colorstrip_itol_file(info_tab, PREFIX, DICT_COLORSTRIP):
 	print("# COLOR STRIP FILE")
 	print("#################\n")
 
-	with open(PREFIX+"_colorstrip.txt", 'w') as writing_file:
+	with open(os.path.join(PREFIX,"colorstrip_systems.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
-		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com\n")
+		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com_Archaellum\n")
 		writing_file.write("COLOR\t#ff0000\n")
 		writing_file.write("LEGEND_TITLE\tSecretion_system\n")
-		writing_file.write("LEGEND_SHAPES"+"\t1"*len(DICT_COLORSTRIP)+"\n")
-		writing_file.write("LEGEND_COLORS\t"+"\t".join(DICT_COLORSTRIP.values())+"\n")
-		writing_file.write("LEGEND_LABELS\t"+"\t".join(DICT_COLORSTRIP.keys())+"\n")
+		writing_file.write("LEGEND_SHAPES{}\n".format("\t1"*len(DICT_COLORSTRIP)))
+		writing_file.write("LEGEND_COLORS\t{}\n".format("\t".join(DICT_COLORSTRIP.values())))
+		writing_file.write("LEGEND_LABELS\t{}\n".format("\t".join(DICT_COLORSTRIP.keys())))
 		writing_file.write("DATA\n")
 
-		progression=0
-
-		for seq in info_tab :
-
-			progression += 1
-			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
-			sys.stdout.flush()
-
-			if "generic" in seq[0] or "choice" in seq[0] or "generique" in seq[0]:
-				continue
-			else:
-				writing_file.write("{}\t{}\n".format(seq[0], DICT_COLORSTRIP[seq[-1]]))
+		info_df = info_df[~info_df.Predicted_system.isin(["generic", "generique", "choice"])].reset_index(drop=True)
+		info_df["color_strip"] = info_df.apply(lambda x : DICT_COLORSTRIP[x.Predicted_system], axis=1)
+		info_df[["NewName", "color_strip"]].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
 
 	print()
 	print("Done !")
@@ -94,15 +87,15 @@ def create_colorstrip_itol_file(info_tab, PREFIX, DICT_COLORSTRIP):
 ##########################################################################################
 ##########################################################################################
 
-def create_binary_itol_file(info_tab, PREFIX):
+def create_binary_itol_file(info_df, PREFIX):
 
 	"""
-	Function that create a file in itol color label format for the sequence in the info_tab
+	Function that create a file in itol color label format for the sequence in the info_df
 	and set all the verified sequence will have grey square
 
-	:param info_tab: table of the annotation table
-	:type: numpy.ndarray
-	:param PREFIX: path and begin (prefix) of the new file name
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
 	:type: str
 	:return: Nothing
 	"""
@@ -111,31 +104,23 @@ def create_binary_itol_file(info_tab, PREFIX):
 	print("# LABEL BINARY FILE")
 	print("#################\n")
 
-	with open(PREFIX+"_labelbinary.txt", 'w') as writing_file:
+	with open(os.path.join(PREFIX,"labelbinary_verified.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("COLOR\t#a4a4a4\n")
 		writing_file.write("DATASET_LABEL\tVerify_sequence\n")
 		writing_file.write("FIELD_SHAPES\t1\n")
 		writing_file.write("FIELD_LABELS\tverified\n")
+		writing_file.write("FIELD_COLORS\t#a4a4a4\n")
 		writing_file.write("LEGEND_TITLE\tExperimentaly_verified_sequences\n")
 		writing_file.write("LEGEND_SHAPES\t1\n")
 		writing_file.write("LEGEND_COLORS\t#a4a4a4\n")
 		writing_file.write("LEGEND_LABELS\tverify\n")
 		writing_file.write("DATA\n")
 
-		progression = 0
-
-		for seq in info_tab :
-
-			progression += 1
-			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
-			sys.stdout.flush()
-
-			if "_V_" in seq[0] :
-				writing_file.write("{}\t1\n".format(seq[0]))
-			else :
-				writing_file.write("{}\t0\n".format(seq[0]))
+		info_df = info_df.replace({"System_status":{"V":1, "D":0}})
+		info_df[["NewName", "System_status"]].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
 
 	print()
 	print("Done !")
@@ -146,15 +131,15 @@ def create_binary_itol_file(info_tab, PREFIX):
 
 
 
-def create_colorrange_itol_file(info_tab, PREFIX, DICT_COLORRANGE):
+def create_colorrange_itol_file(info_df, PREFIX, DICT_COLORRANGE):
 
 	"""
-	Function that create a file in itol color range format for the sequence in the info_tab
+	Function that create a file in itol color range format for the sequence in the info_df
 	and with color for each kingdom or subkingdom
 
-	:param info_tab: table of the annotation table
-	:type: numpy.ndarray
-	:param PREFIX: path and begin (prefix) of the new file name
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
 	:type: str
 	:param DICT_COLORRANGE: dictionnary that contain the name of the phylum with a color associate
 	:type: dict
@@ -165,27 +150,18 @@ def create_colorrange_itol_file(info_tab, PREFIX, DICT_COLORRANGE):
 	print("# COLOR RANGE FILE")
 	print("#################\n")
 
-	with open(PREFIX+"_colorrange.txt", 'w') as writing_file:
+	with open(os.path.join(PREFIX,"colorrange_phylum.txt"), 'w') as writing_file:
 		writing_file.write("TREE_COLORS\n")
-		writing_file.write("SEPARATOR SPACE\n")
+		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
-		progression = 0
 
-		for seq in info_tab :
+		info_df["range_col"] = "range"
+		info_df["name_range"] = info_df.apply(lambda x: x.Phylum if x.Phylum in DICT_COLORRANGE else x.Kingdom, axis=1)
+		info_df["color_lineage"] = info_df.apply(lambda x: DICT_COLORRANGE[x.name_range], axis=1)
 
-			progression += 1
-			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
-			sys.stdout.flush()
-
-			lineage = seq[-2]
-
-			if lineage in DICT_COLORRANGE :
-				writing_file.write(seq[0]+" range "+DICT_COLORRANGE[lineage]+" "+lineage+"\n")
-			elif seq[-3]=="Archaea":
-				writing_file.write(seq[0]+" range "+DICT_COLORRANGE["Archaea"]+" Archaea\n")
-			else :
-				writing_file.write(seq[0]+" range "+DICT_COLORRANGE["Bacteria"]+" Bacteria\n")
+		info_df[["NewName","range_col", "color_lineage", "name_range"]].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
 
 	print()
 	print("Done !")
@@ -194,17 +170,15 @@ def create_colorrange_itol_file(info_tab, PREFIX, DICT_COLORRANGE):
 ##########################################################################################
 ##########################################################################################
 
-
-
-def create_labels_itol_file(info_tab, PREFIX):
+def create_labels_itol_file(info_df, PREFIX):
 
 
 	"""
 	Function that let the possibility to change the name of the leafs' label
 
-	:param info_tab: table of the annotation table
-	:type: numpy.ndarray
-	:param PREFIX: path and begin (prefix) of the new file name
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
 	:type: str
 	:return: Nothing
 	"""
@@ -213,17 +187,17 @@ def create_labels_itol_file(info_tab, PREFIX):
 	print("# LABELS FILE")
 	print("#################\n")
 
-	with open(PREFIX+"_id_label.txt", 'w') as writing_file:
+	with open(os.path.join(PREFIX,"id_label.txt"), 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
 		progression=0
 
-		for seq in info_tab :
+		for seq in info_df :
 
 			progression += 1
-			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_df.shape[0])*100, progression,info_df.shape[0]))
 			sys.stdout.flush()
 
 			writing_file.write("{}\t{}\n".format(seq[0],seq[2]))
@@ -236,17 +210,15 @@ def create_labels_itol_file(info_tab, PREFIX):
 ##########################################################################################
 ##########################################################################################
 
-
-
-def create_labels_itol_file_reverse(info_tab, PREFIX):
+def create_labels_itol_file_reverse(info_df, PREFIX):
 
 
 	"""
 	Function that let the possibility to change the name of the leafs' label
 
-	:param info_tab: table of the annotation table
-	:type: numpy.ndarray
-	:param PREFIX: path and begin (prefix) of the new file name
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
 	:type: str
 	:return: Nothing
 	"""
@@ -255,17 +227,17 @@ def create_labels_itol_file_reverse(info_tab, PREFIX):
 	print("# LABELS REVERSE FILE")
 	print("#################\n")
 
-	with open(PREFIX+"_id_label_reverse.txt", 'w') as writing_file:
+	with open(os.path.join(PREFIX,"id_label_reverse.txt"), 'w') as writing_file:
 		writing_file.write("LABELS\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("DATA\n")
 
 		progression=0
 
-		for seq in info_tab :
+		for seq in info_df :
 
 			progression += 1
-			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_tab.shape[0])*100, progression,info_tab.shape[0]))
+			sys.stdout.write("{:.2f}% : {}/{} sequences\r".format(progression/float(info_df.shape[0])*100, progression,info_df.shape[0]))
 			sys.stdout.flush()
 
 			writing_file.write("{}\t{}\n".format(seq[2],seq[0]))
@@ -361,7 +333,7 @@ def create_color_dict(cmap, col_infoTab, name) :
 	:type: str
 	:param col_infoTab: the column of the INFO_TAB with the name of the system
 	or phylum
-	:type: numpy.ndarray
+	:type: pandas.DataFrame
 	:param name: name of the file *.color
 	:type: str
 	:return: the dictionary contructed with name as keys and color as values
@@ -381,44 +353,54 @@ def create_color_dict(cmap, col_infoTab, name) :
 ##########################################################################################
 ##########################################################################################
 
-def write_big_new_file(file_tab, file_f, write_file) :
+def create_binary_itol_file_auto(info_df, PREFIX, columns_names, colors):
 
 	"""
-	Function that take the information about the system in the fasta file and put all the information about taxonomy
-	and name
+	Function that create a file in itol color label format for the sequence in the info_df
+	and set all the verified sequence will have grey square
 
-	:param file_tab: Name of the file with the taxonomic information
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
 	:type: str
-	:param file_f: name of the alignement file in fasta format
-	:type: str
-	:param write_file: name of the file where we want to write the information
-	:type: str
+	:param columns_names: Name of the columns we want to set
+	:type: list of str
+	:param colors: The colors for each params
+	:type: list of str
+	:return: Nothing
 	"""
 
-	tab_info = np.genfromtxt(file_tab, delimiter="\t", dtype="str", comments="##")
+	print("\n#################")
+	print("# LABEL BINARY FILE")
+	print("#################\n")
 
-	with open(write_file, "w") as w_file :
-		line = "#{}\t{}\t{}\t{}\t{}\t{}\n".format("leaf_name", "species_id", "species_name", "kingdom", "phylum", "system")
-		w_file.write(line)
-		for seq in SeqIO.parse(file_f, format="fasta") :
-			if "NC_" == seq.id[:3] :
-				name_species = "_".join(seq.id.split("_")[:2])
-				if 'T4SS' in seq.id :
-					system_name = re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)
-				else :
-					system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
+	with open(os.path.join(PREFIX,"labelbinary_params_test.txt"), 'w') as writing_file:
+		writing_file.write("DATASET_BINARY\n")
+		writing_file.write("SEPARATOR TAB\n")
+		writing_file.write("COLOR\t{}\n".format(colors[0]))
+		writing_file.write("DATASET_LABEL\tParams test\n")
+		writing_file.write("FIELD_SHAPES{}\n".format("\t1"*len(columns_names)))
+		writing_file.write("FIELD_LABELS\t{}\n".format("\t".join(columns_names)))
+		writing_file.write("FIELD_COLORS\t{}\n".format("\t".join(colors)))
+		# XXX Permet d'avoir une legend dans le dessin
+		writing_file.write("LEGEND_TITLE\tTest Params Duplicates\n")
+		writing_file.write("LEGEND_SHAPES{}\n".format("\t1"*len(columns_names)))
+		writing_file.write("LEGEND_COLORS\t{}\n".format("\t".join(colors)))
+		writing_file.write("LEGEND_LABELS\t{}\n".format("\t".join(columns_names)))
+		writing_file.write("DATA\n")
+
+		if "System_status" in info_df.columns :
+			info_df = info_df[info_df.System_status == "D"].reset_index(drop=True)
+
+		for column_name in columns_names :
+			if "Multi_copy" in info_df.columns :
+				info_df[column_name] = info_df.apply(lambda x : -1 if x.Multi_copy == "No" else 1 if x[column_name] == "Yes" else 0, axis=1)
 			else :
-				name_species = seq.id.split("_")[0][:4]
-				# NOTE Si gembase retourne au code 2013
-				if "_D_" in seq.id :
-					if "T4SS" in seq.id :
-						system_name = re.search("vir[Bb][0-9][0-9]?", seq.id).group(0)
-					else:
-						system_name = seq.id.split("_")[seq.id.split("_").index("D")-1]
-				else :
-					system_name = seq.id.split("_")[seq.id.split("_").index("V")-1]
+				info_df[column_name] = info_df.apply(lambda x : 1 if x[column_name] == "Yes" else 0, axis=1)
 
-			index_species = tab_info[:,0].tolist().index(name_species)
-			line = "{}\t{}\t{}\t{}\t{}\t{}\n".format(seq.id, tab_info[index_species,0], " ".join(tab_info[index_species,1].split(" ")[:2]), tab_info[index_species,2], tab_info[index_species,3], system_name)
-			w_file.write(line)
+		info_df[["NewName"]+columns_names].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
+
+	print()
+	print("Done !")
 	return
