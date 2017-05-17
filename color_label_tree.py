@@ -91,7 +91,7 @@ def create_binary_itol_file(info_df, PREFIX):
 
 	"""
 	Function that create a file in itol color label format for the sequence in the info_df
-	and set all the verified sequence will have grey square
+	and set all the validated sequence will have grey square
 
 	:param info_df: table of the annotation table
 	:type: pandas.DataFrame
@@ -104,15 +104,15 @@ def create_binary_itol_file(info_df, PREFIX):
 	print("# LABEL BINARY FILE")
 	print("#################\n")
 
-	with open(os.path.join(PREFIX,"labelbinary_verified.txt"), 'w') as writing_file:
+	with open(os.path.join(PREFIX,"labelbinary_validated.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
 		writing_file.write("COLOR\t#a4a4a4\n")
 		writing_file.write("DATASET_LABEL\tVerify_sequence\n")
 		writing_file.write("FIELD_SHAPES\t1\n")
-		writing_file.write("FIELD_LABELS\tverified\n")
+		writing_file.write("FIELD_LABELS\tvalidated\n")
 		writing_file.write("FIELD_COLORS\t#a4a4a4\n")
-		writing_file.write("LEGEND_TITLE\tExperimentaly_verified_sequences\n")
+		writing_file.write("LEGEND_TITLE\tExperimentaly_validated_sequences\n")
 		writing_file.write("LEGEND_SHAPES\t1\n")
 		writing_file.write("LEGEND_COLORS\t#a4a4a4\n")
 		writing_file.write("LEGEND_LABELS\tverify\n")
@@ -157,6 +157,7 @@ def create_colorrange_itol_file(info_df, PREFIX, DICT_COLORRANGE):
 
 
 		info_df["range_col"] = "range"
+		#info_df["name_range"] = info_df.apply(lambda x: x.Phylum if x.Phylum in DICT_COLORRANGE else x.Lineage.split(";")[2] if x.Phylum == "Proteobacteria" else x.Kingdom, axis=1)
 		info_df["name_range"] = info_df.apply(lambda x: x.Phylum if x.Phylum in DICT_COLORRANGE else x.Kingdom, axis=1)
 		info_df["color_lineage"] = info_df.apply(lambda x: DICT_COLORRANGE[x.name_range], axis=1)
 
@@ -357,7 +358,7 @@ def create_binary_itol_file_auto(info_df, PREFIX, columns_names, colors):
 
 	"""
 	Function that create a file in itol color label format for the sequence in the info_df
-	and set all the verified sequence will have grey square
+	and set all the information about the evalue and score and multi copy ...
 
 	:param info_df: table of the annotation table
 	:type: pandas.DataFrame

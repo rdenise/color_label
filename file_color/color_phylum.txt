@@ -1,3 +1,4 @@
+//OLD COLOR
 Acidobacteria	#c5a583
 Actinobacteria	#89955f
 Archaea	#bcf5a9
@@ -10,7 +11,5 @@ Fibrobacteres	#81b1d2
 Firmicutes	#ebe891
 Nitrospirae	#b3de69
 Planctomycetes	#ac58fa
-Plasmid	#f8e0f7
 Proteobacteria	#f78181
 Thermodesulfobacteria	#bc82bd
-Viruses	#d8d8d8

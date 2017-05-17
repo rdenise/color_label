@@ -63,6 +63,10 @@ annotation_option.add_argument("-add_col",'--add_columns',
 							nargs="+",
 							default=None,
 							help="Add columns to set binary with it, each columns need to be in the annotation table with 'Yes' or 'No' values for each nodes")
+annotation_option.add_argument("-sys",'--systemtree',
+							action='store_true',
+							dest="systemtree",
+							help="Option to know if the name of the tree is a systems tree or genes tree")
 
 color_option = parser.add_argument_group(title = "Color options")
 color_option.add_argument("-sysCo",'--systemsColor',
@@ -97,8 +101,14 @@ if FORMAT != "fasta" :
 file_tab = args.annotFile
 
 df_tab = pd.read_table(file_tab)
-df_tab = df_tab[df_tab.NewName.isin(all_leafs)].reset_index(drop=True)
-#tab_numpy = np.genfromtxt(file_tab, delimiter="\t", dtype="str")
+
+if args.systemtree :
+	df_tab = df_tab[df_tab.System_Id.isin(all_leafs)].reset_index(drop=True)
+	df_tab.drop_duplicates(subset='System_Id', keep='first', inplace=True)
+	df_tab['NewName'] = df_tab["System_Id"]
+
+else :
+	df_tab = df_tab[df_tab.NewName.isin(all_leafs)].reset_index(drop=True)
 
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
