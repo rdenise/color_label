@@ -56,7 +56,7 @@ annotation_option.add_argument("-annot",'--annotationtab',
 							dest="annotFile",
 							default=None,
 							required=True,
-							help="File with the annotation for each leaf in the tree in rigth format")
+							help="File with the annotation for each leaf in the tree in right format")
 annotation_option.add_argument("-add_col",'--add_columns',
 							metavar="<COLUMN_NAME>",
 							dest="add_columns",
@@ -92,12 +92,12 @@ create_folder(OUTPUT)
 FORMAT = args.format.lower()
 
 file_name = os.path.abspath(args.seqFile)
-all_leafs = list(SeqIO.to_dict(SeqIO.parse(file_name, 'fasta')).keys())
 
 if FORMAT != "fasta" :
 	file_name_abspath = conversion_alignment(file_name, FORMAT)
 	file_name = file_name_abspath
 
+all_leafs = list(SeqIO.to_dict(SeqIO.parse(file_name, 'fasta')).keys())
 file_tab = args.annotFile
 
 df_tab = pd.read_table(file_tab)
@@ -109,6 +109,7 @@ if args.systemtree :
 
 else :
 	df_tab = df_tab[df_tab.NewName.isin(all_leafs)].reset_index(drop=True)
+
 
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
