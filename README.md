@@ -32,11 +32,3 @@ The color files need to be a tabulate separate file with these columns:
 name(phylum or system) **[TAB]** color(hexadecimal code)
 
 comments line need to begin by **//**
-
-Index(['NewName', 'Hit_Id', 'Replicon_name', 'Position', 'Sequence_length',
-       'Gene', 'Reference_system', 'Predicted_system', 'System_Id',
-       'System_status', 'Gene_status', 'i-evalue', 'Score', 'Profile_coverage',
-       'Sequence_coverage', 'Begin_match', 'End_match', 'Tandem', 'Loner',
-       'Loner_unique', 'Multi_copy', 'Max_Score', 'Min_ievalue', 'Kingdom',
-       'Phylum'],
-      dtype='object')
