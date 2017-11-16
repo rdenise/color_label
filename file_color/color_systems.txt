@@ -1,7 +1,7 @@
 T2SS	#4000ff
 T4P	#ffe080
 Tad	#ff0000
-Com	#a901db
+ComM	#a901db
 //Tcp	#00ff00
 //Bfp	#088a4b
 //R64	#d0fa58
@@ -10,5 +10,9 @@ Com	#a901db
 T4bP	#00ff00
 MSH	#fa58ac
 //virB11	#d8d8d8
-Archaellum	#fe9a2e
-//virb4	#fe2ef7
+t4cp2	#d8d8d8
+//Archaellum	#fe9a2e
+T4PArchaea	#fe9a2e
+virb4	#ff99fb
+generic	#d1cfce
+FtsK	#ff99c9

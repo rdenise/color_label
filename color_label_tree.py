@@ -75,7 +75,7 @@ def create_colorstrip_itol_file(info_df, PREFIX, DICT_COLORSTRIP):
 		writing_file.write("LEGEND_LABELS\t{}\n".format("\t".join(DICT_COLORSTRIP.keys())))
 		writing_file.write("DATA\n")
 
-		info_df = info_df[~info_df.Predicted_system.isin(["generic", "generique", "choice"])].reset_index(drop=True)
+		#info_df = info_df[~info_df.Predicted_system.isin(["generic", "generique", "choice"])].reset_index(drop=True)
 		info_df["color_strip"] = info_df.apply(lambda x : DICT_COLORSTRIP[x.Predicted_system], axis=1)
 		info_df[["NewName", "color_strip"]].to_csv(writing_file, sep="\t", index=None, header=None)
 		writing_file.write("\n")
@@ -118,7 +118,7 @@ def create_binary_itol_file(info_df, PREFIX):
 		writing_file.write("LEGEND_LABELS\tverify\n")
 		writing_file.write("DATA\n")
 
-		info_df = info_df.replace({"System_status":{"V":1, "D":0}})
+		info_df = info_df.replace({"System_status":{"V":1, "D":-1}})
 		info_df[["NewName", "System_status"]].to_csv(writing_file, sep="\t", index=None, header=None)
 		writing_file.write("\n")
 
@@ -400,6 +400,45 @@ def create_binary_itol_file_auto(info_df, PREFIX, columns_names, colors):
 				info_df[column_name] = info_df.apply(lambda x : 1 if x[column_name] == "Yes" else 0, axis=1)
 
 		info_df[["NewName"]+columns_names].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
+
+	print()
+	print("Done !")
+	return
+
+##########################################################################################
+##########################################################################################
+
+def create_popup_info_itol_file(info_df, PREFIX):
+
+
+	"""
+	Function that let the possibility to change the name of the leafs' label
+
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
+	:type: str
+	:return: Nothing
+	"""
+
+	print("\n#################")
+	print("# POPUP FILE")
+	print("#################\n")
+
+	with open(os.path.join(PREFIX,"popup_info.txt"), 'w') as writing_file:
+		writing_file.write("POPUP_INFO\n")
+		writing_file.write("SEPARATOR TAB\n")
+		writing_file.write("DATA\n")
+
+		progression=0
+
+
+		##9606,Homo sapiens info popup,<h1>Homo sapiens</h1><p style='color:blue'>More info at <a target='_blank' href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606'>NCBI</a></p>
+
+		info_df["NewName2"] = info_df["NewName"]
+		info_df["popup"] = info_df.apply(lambda x : "<h4 style='color:blue'>{}</h4><h4>Info Lineage :</h4><h5>Kingdom</h5><p style='color:blue'>{}</p><h5>Phylum</h5><p style='color:blue'>{}</p><h5>Full lineage</h5><p style='color:blue'>{}</p> ".format(x.Species, x.Kingdom, x.Phylum, x.Lineage), axis=1)
+		info_df[["NewName","NewName2",  "popup"]].to_csv(writing_file, sep="\t", index=None, header=None)
 		writing_file.write("\n")
 
 	print()

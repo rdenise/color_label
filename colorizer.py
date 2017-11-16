@@ -2,6 +2,7 @@
 
 import argparse
 from textwrap import dedent
+from ete3 import Tree
 import sys, os
 import time
 
@@ -36,12 +37,17 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
 
 general_option = parser.add_argument_group(title = "General input dataset options")
 general_option.add_argument("-s",'--seqfile',
- 							required=True,
+ 							required=False,
 							metavar="<file>",
 							dest="seqFile",
 							help="File with the sequences used for the alignment")
+general_option.add_argument("-t",'--treefile',
+ 							required=False,
+							metavar="<file>",
+							dest="treefile",
+							help="File of the tree to colorize")
 general_option.add_argument("-f",'--format',
-							required=True,
+							required=False,
 							dest="format",
 							help="")
 general_option.add_argument("-o",'--output',
@@ -82,22 +88,34 @@ color_option.add_argument("-phyCo",'--phylumColor',
 
 args = parser.parse_args()
 
+if args.treefile :
+	T = Tree(args.treefile)
+	all_leafs = T.get_leaf_names()
+	file_name = os.path.abspath(args.treefile)
+elif args.seqfile :
+	if args.format :
+		FORMAT = args.format.lower()
+	else :
+		sys.exit("The -f/--format is needed with a sequence file")
+
+	file_name = os.path.abspath(args.seqFile)
+
+	if FORMAT != "fasta" :
+		file_name_abspath = conversion_alignment(file_name, FORMAT)
+		file_name = file_name_abspath
+
+	all_leafs = list(SeqIO.to_dict(SeqIO.parse(file_name, 'fasta')).keys())
+else :
+	sys.exit("The option -s/--seqfile or -t/--treefile is needed")
+
+
 if not args.output :
-	OUTPUT = os.path.join(os.path.abspath(args.seqFile),"colorize_{}".format(time.strftime("%d_%m_%y")))
+	OUTPUT = os.path.join(os.path.dirname(file_name),"colorize_{}".format(time.strftime("%d_%m_%y")))
 else :
 	OUTPUT = args.output
 
 create_folder(OUTPUT)
 
-FORMAT = args.format.lower()
-
-file_name = os.path.abspath(args.seqFile)
-
-if FORMAT != "fasta" :
-	file_name_abspath = conversion_alignment(file_name, FORMAT)
-	file_name = file_name_abspath
-
-all_leafs = list(SeqIO.to_dict(SeqIO.parse(file_name, 'fasta')).keys())
 file_tab = args.annotFile
 
 df_tab = pd.read_table(file_tab)
@@ -109,7 +127,6 @@ if args.systemtree :
 
 else :
 	df_tab = df_tab[df_tab.NewName.isin(all_leafs)].reset_index(drop=True)
-
 
 #Paired bon pour les systemes < 12 sinon nipy_spectral
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
@@ -125,13 +142,14 @@ else :
 	DICT_COLORRANGE = read_color_file(args.phylumColor)
 
 # Appel des fonctions
-######
 
 create_colorstrip_itol_file(df_tab, OUTPUT, DICT_COLORSTRIP)
 
 create_binary_itol_file(df_tab, OUTPUT)
 
 create_colorrange_itol_file(df_tab, OUTPUT, DICT_COLORRANGE)
+
+create_popup_info_itol_file(df_tab, OUTPUT)
 
 if args.add_columns :
 	number_of_columns = len(args.add_columns)
@@ -146,5 +164,5 @@ if args.add_columns :
 ######
 # Fin des fonctions
 
-if FORMAT != "fasta" :
+if args.format and FORMAT != "fasta" :
 	os.remove(file_name_abspath)
