@@ -17,6 +17,7 @@ import pandas as pd
 import re
 import matplotlib.cm as cm
 import matplotlib.colors as colors
+from itertools import cycle
 
 ##########################################################################################
 ##########################################################################################
@@ -325,7 +326,7 @@ def read_color_file(color_file) :
 ##########################################################################################
 ##########################################################################################
 
-def create_color_dict(cmap, col_infoTab, name) :
+def create_color_dict(cmap, col_infoTab, name, PREFIX) :
 
 	"""
 	Function that create the color file and set the dictionnary with it
