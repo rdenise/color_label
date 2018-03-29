@@ -46,7 +46,7 @@ def create_folder(mypath):
 ##########################################################################################
 ##########################################################################################
 
-def create_colorstrip_itol_file(info_df, PREFIX, DICT_COLORSTRIP):
+def create_colorstrip_itol_file_systems(info_df, PREFIX, DICT_COLORSTRIP):
 
 	"""
 	Function that create a file in itol colorstrip format for the sequence in the info_df
@@ -68,16 +68,64 @@ def create_colorstrip_itol_file(info_df, PREFIX, DICT_COLORSTRIP):
 	with open(os.path.join(PREFIX,"colorstrip_systems.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
-		writing_file.write("DATASET_LABEL\tT2SS_T4P_Tad_Com_Archaellum\n")
+		writing_file.write("DATASET_LABEL\Systems\n")
 		writing_file.write("COLOR\t#ff0000\n")
 		writing_file.write("LEGEND_TITLE\tSecretion_system\n")
 		writing_file.write("LEGEND_SHAPES{}\n".format("\t1"*len(DICT_COLORSTRIP)))
 		writing_file.write("LEGEND_COLORS\t{}\n".format("\t".join(DICT_COLORSTRIP.values())))
 		writing_file.write("LEGEND_LABELS\t{}\n".format("\t".join(DICT_COLORSTRIP.keys())))
+		writing_file.write("STRIP_WIDTH\t50\n")
+		writing_file.write("MARGIN\t25\n")
 		writing_file.write("DATA\n")
 
 		#info_df = info_df[~info_df.Predicted_system.isin(["generic", "generique", "choice"])].reset_index(drop=True)
 		info_df["color_strip"] = info_df.apply(lambda x : DICT_COLORSTRIP[x.Predicted_system], axis=1)
+		info_df[["NewName", "color_strip"]].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
+
+	print()
+	print("Done !")
+	return
+
+
+##########################################################################################
+##########################################################################################
+
+def create_colorstrip_itol_file_phylum(info_df, PREFIX, DICT_COLORSTRIP):
+
+	"""
+	Function that create a file in itol colorstrip format for the sequence in the info_df
+	with color for each kind of systems
+
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
+	:type: str
+	:param DICT_COLORRANGE: dictionnary that contain the name of the systems with a color associate
+	:type: dict
+	:return: Nothing
+	"""
+
+	print("\n#################")
+	print("# COLOR STRIP FILE")
+	print("#################\n")
+
+	with open(os.path.join(PREFIX,"colorstrip_phylum.txt"), 'w') as writing_file:
+		writing_file.write("DATASET_COLORSTRIP\n")
+		writing_file.write("SEPARATOR TAB\n")
+		writing_file.write("DATASET_LABEL\tPhylum\n")
+		writing_file.write("COLOR\t#ff0000\n")
+		writing_file.write("LEGEND_TITLE\tPhylum\n")
+		writing_file.write("LEGEND_SHAPES{}\n".format("\t1"*len(DICT_COLORSTRIP)))
+		writing_file.write("LEGEND_COLORS\t{}\n".format("\t".join(DICT_COLORSTRIP.values())))
+		writing_file.write("LEGEND_LABELS\t{}\n".format("\t".join(DICT_COLORSTRIP.keys())))
+		writing_file.write("STRIP_WIDTH\t50\n")
+		writing_file.write("MARGIN\t25\n")		
+		writing_file.write("DATA\n")
+
+		#info_df = info_df[~info_df.Predicted_system.isin(["generic", "generique", "choice"])].reset_index(drop=True)
+		info_df["name_range"] = info_df.apply(lambda x: x.Phylum if x.Phylum in DICT_COLORSTRIP else x.Kingdom, axis=1)
+		info_df["color_strip"] = info_df.apply(lambda x: DICT_COLORSTRIP[x.name_range], axis=1)
 		info_df[["NewName", "color_strip"]].to_csv(writing_file, sep="\t", index=None, header=None)
 		writing_file.write("\n")
 
@@ -108,14 +156,14 @@ def create_binary_itol_file(info_df, PREFIX):
 	with open(os.path.join(PREFIX,"labelbinary_validated.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_BINARY\n")
 		writing_file.write("SEPARATOR TAB\n")
-		writing_file.write("COLOR\t#a4a4a4\n")
-		writing_file.write("DATASET_LABEL\tVerify_sequence\n")
+		writing_file.write("COLOR\t#b15928\n")
+		writing_file.write("DATASET_LABEL\tValidated sequence\n")
 		writing_file.write("FIELD_SHAPES\t1\n")
 		writing_file.write("FIELD_LABELS\tvalidated\n")
-		writing_file.write("FIELD_COLORS\t#a4a4a4\n")
-		writing_file.write("LEGEND_TITLE\tExperimentaly_validated_sequences\n")
+		writing_file.write("FIELD_COLORS\t#b15928\n")
+		writing_file.write("LEGEND_TITLE\tExperimentaly validated sequences\n")
 		writing_file.write("LEGEND_SHAPES\t1\n")
-		writing_file.write("LEGEND_COLORS\t#a4a4a4\n")
+		writing_file.write("LEGEND_COLORS\t#b15928\n")
 		writing_file.write("LEGEND_LABELS\tverify\n")
 		writing_file.write("DATA\n")
 
@@ -132,7 +180,7 @@ def create_binary_itol_file(info_df, PREFIX):
 
 
 
-def create_colorrange_itol_file(info_df, PREFIX, DICT_COLORRANGE):
+def create_colorrange_itol_file_phylum(info_df, PREFIX, DICT_COLORRANGE):
 
 	"""
 	Function that create a file in itol color range format for the sequence in the info_df
@@ -162,6 +210,48 @@ def create_colorrange_itol_file(info_df, PREFIX, DICT_COLORRANGE):
 		info_df["name_range"] = info_df.apply(lambda x: x.Phylum if x.Phylum in DICT_COLORRANGE else x.Kingdom, axis=1)
 		info_df["color_lineage"] = info_df.apply(lambda x: DICT_COLORRANGE[x.name_range], axis=1)
 
+		info_df[["NewName","range_col", "color_lineage", "name_range"]].to_csv(writing_file, sep="\t", index=None, header=None)
+		writing_file.write("\n")
+
+	print()
+	print("Done !")
+	return
+
+##########################################################################################
+##########################################################################################
+
+
+
+def create_colorrange_itol_file_systems(info_df, PREFIX, DICT_COLORRANGE):
+
+	"""
+	Function that create a file in itol color range format for the sequence in the info_df
+	and with color for each kingdom or subkingdom
+
+	:param info_df: table of the annotation table
+	:type: pandas.DataFrame
+	:param PREFIX: the path to the forlder of the new file name
+	:type: str
+	:param DICT_COLORRANGE: dictionnary that contain the name of the phylum with a color associate
+	:type: dict
+	:return: Nothing
+	"""
+
+	print("\n#################")
+	print("# COLOR RANGE FILE")
+	print("#################\n")
+
+	with open(os.path.join(PREFIX,"colorrange_systems.txt"), 'w') as writing_file:
+		writing_file.write("TREE_COLORS\n")
+		writing_file.write("SEPARATOR TAB\n")
+		writing_file.write("DATA\n")
+
+
+		info_df["range_col"] = "range"
+		#info_df["name_range"] = info_df.apply(lambda x: x.Phylum if x.Phylum in DICT_COLORRANGE else x.Lineage.split(";")[2] if x.Phylum == "Proteobacteria" else x.Kingdom, axis=1)
+		info_df["name_range"] = info_df.apply(lambda x: x.Predicted_system, axis=1)
+		info_df["color_lineage"] = info_df.apply(lambda x : DICT_COLORRANGE[x.Predicted_system], axis=1)
+		
 		info_df[["NewName","range_col", "color_lineage", "name_range"]].to_csv(writing_file, sep="\t", index=None, header=None)
 		writing_file.write("\n")
 

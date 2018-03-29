@@ -132,22 +132,24 @@ else :
 #Set3 pour les phylums < 12 sinon rainbow (mais pas beau et vraiment proche)
 
 if not args.sysColor :
-	DICT_COLORSTRIP = create_color_dict("nipy_spectral", df_tab.Predicted_System, "systems.color", OUTPUT)
+	DICT_COLORSYSTEM = create_color_dict("Paired", df_tab.Predicted_System, "systems.color", OUTPUT)
 else :
-	DICT_COLORSTRIP = read_color_file(args.sysColor)
+	DICT_COLORSYSTEM = read_color_file(args.sysColor)
 
 if not args.phylumColor :
-	DICT_COLORRANGE = create_color_dict("Paired", df_tab.Phylum, "phylum.color", OUTPUT)
+	DICT_COLORPHYLUM = create_color_dict("nipy_spectral", df_tab.Phylum, "phylum.color", OUTPUT)
 else :
-	DICT_COLORRANGE = read_color_file(args.phylumColor)
+	DICT_COLORPHYLUM = read_color_file(args.phylumColor)
 
 # Appel des fonctions
 
-create_colorstrip_itol_file(df_tab, OUTPUT, DICT_COLORSTRIP)
+create_colorstrip_itol_file_systems(df_tab, OUTPUT, DICT_COLORSYSTEM)
+create_colorstrip_itol_file_phylum(df_tab, OUTPUT, DICT_COLORPHYLUM)
 
 create_binary_itol_file(df_tab, OUTPUT)
 
-create_colorrange_itol_file(df_tab, OUTPUT, DICT_COLORRANGE)
+create_colorrange_itol_file_systems(df_tab, OUTPUT, DICT_COLORSYSTEM)
+create_colorrange_itol_file_phylum(df_tab, OUTPUT, DICT_COLORPHYLUM)
 
 create_popup_info_itol_file(df_tab, OUTPUT)
 
