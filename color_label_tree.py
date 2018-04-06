@@ -68,7 +68,7 @@ def create_colorstrip_itol_file_systems(info_df, PREFIX, DICT_COLORSTRIP):
 	with open(os.path.join(PREFIX,"colorstrip_systems.txt"), 'w') as writing_file:
 		writing_file.write("DATASET_COLORSTRIP\n")
 		writing_file.write("SEPARATOR TAB\n")
-		writing_file.write("DATASET_LABEL\Systems\n")
+		writing_file.write("DATASET_LABEL\tSystems\n")
 		writing_file.write("COLOR\t#ff0000\n")
 		writing_file.write("LEGEND_TITLE\tSecretion_system\n")
 		writing_file.write("LEGEND_SHAPES{}\n".format("\t1"*len(DICT_COLORSTRIP)))
@@ -528,7 +528,7 @@ def create_popup_info_itol_file(info_df, PREFIX):
 		##9606,Homo sapiens info popup,<h1>Homo sapiens</h1><p style='color:blue'>More info at <a target='_blank' href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606'>NCBI</a></p>
 
 		info_df["NewName2"] = info_df["NewName"]
-		info_df["popup"] = info_df.apply(lambda x : "<h4 style='color:blue'>{}</h4><h4>Info Lineage :</h4><h5>Kingdom</h5><p style='color:blue'>{}</p><h5>Phylum</h5><p style='color:blue'>{}</p><h5>Full lineage</h5><p style='color:blue'>{}</p> ".format(x.Species, x.Kingdom, x.Phylum, x.Lineage), axis=1)
+		info_df["popup"] = info_df.apply(lambda x : "<h4 style='color:blue'>{}</h4><h4>Info Lineage :</h4><h5>Kingdom</h5><p style='color:blue'>{}</p><h5>Phylum</h5><p style='color:blue'>{}</p><h5>Full lineage</h5><p style='color:blue'>{}</p> ".format(x.Species_name, x.Kingdom, x.Phylum, x.Lineage), axis=1)
 		info_df[["NewName","NewName2",  "popup"]].to_csv(writing_file, sep="\t", index=None, header=None)
 		writing_file.write("\n")
 
